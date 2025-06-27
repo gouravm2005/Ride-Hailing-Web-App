@@ -60,7 +60,17 @@ module.exports.loginUser = async(req, res, next) => {
 }
 
 module.exports.getUserProfile = async (req, res, next) => {
- res.status(200).json(req.user);
+//  res.status(200).json(req.user);
+ try {
+    const user = await user.findById(req.user.id).select("-password");
+
+    res.json({
+      name: user.name,
+      email: user.email,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch profile" });
+  }
 }
 
 module.exports.logoutUser = async (req, res, next) => {

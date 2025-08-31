@@ -1,55 +1,67 @@
-import React from 'react'
+import { MapPin, Star, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const AvailableRide = ({onSelectCaptain}) => {
+const AvailableRide = ({ onSelectCaptain, selectedRideType }) => {
+  const [mockCaptains, setmockCaptains] = useState([]);
+
+  useEffect(() => {
+    const auth = JSON.parse(localStorage.getItem("auth"));
+
+    if (!auth || !auth.token)
+      return;
+
+    axios.get(`${import.meta.env.VITE_BASE_URL}/api/captain/getAvailableCaptain`)
+      .then((res) => { setmockCaptains(res.data) })
+      .catch(err => console.error("Error fetching captains:", err));
+  }, [])
+
   return (
-   <div className='w-full h-full bg-white flex flex-col justify-between p-4'>
-     <div onClick={onSelectCaptain} className='w-[90%] h-32 bg-white p-4 flex m-4 rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-20 h-14 rounded-full pr-2 mt-6' src='profile.webp'></img></div>
-     <div className='flex flex-col mt-5'>
-     <h2 className='text-blue-500 text-lg font-semibold'>Captain-1</h2>
-     <h2 className='text-md text-blue-500 font-semibold'>0.2km . 2min away</h2>
-     </div>
-     <div className='mt-8'>
-      <h2 className='text-2xl text-blue-500 font-semibold'>$20</h2>
-     </div>
-    </div>
+    <div className="bg-white p-4 h-full overflow-y-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-800">Available Drivers</h3>
+        <span className="text-sm text-gray-500">{mockCaptains.length} nearby</span>
+      </div>
 
-     <div onClick={onSelectCaptain} className='w-[90%] h-32 bg-white p-4 flex m-4 rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-20 h-14 rounded-full pr-2 mt-6' src='profile.webp'></img></div>
-     <div className='flex flex-col mt-5'>
-     <h2 className='text-blue-500 text-lg font-semibold'>Captain-1</h2>
-     <h2 className='text-md text-blue-500 font-semibold'>0.2km . 2min away</h2>
-     </div>
-     <div className='mt-8'>
-      <h2 className='text-2xl text-blue-500 font-semibold'>$20</h2>
-     </div>
-    </div>
+      <div className="space-y-4">
+        {mockCaptains.map((captain) => (
+          <div
+            key={captain.id}
+            onClick={() => onSelectCaptain && onSelectCaptain(captain.email)}
+            className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{captain.fullname.firstname}{captain.fullname.lastname}</h4>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <span className="text-sm text-gray-600">{captain.rideStats.rating}</span>
+                    <span className="text-sm text-gray-400">({captain.rideStats.totalRides} rides)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-lg text-gray-900">₹{captain.rideFeePerKm}</p>
+                <p className="text-sm text-gray-500">{captain.time} away</p>
+              </div>
+            </div>
 
-     <div onClick={onSelectCaptain} className='w-[90%] h-32 bg-white p-4 flex m-4 rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-20 h-14 rounded-full pr-2 mt-6' src='profile.webp'></img></div>
-     <div className='flex flex-col mt-5'>
-     <h2 className='text-blue-500 text-lg font-semibold'>Captain-1</h2>
-     <h2 className='text-md text-blue-500 font-semibold'>0.2km . 2min away</h2>
-     </div>
-     <div className='mt-8'>
-      <h2 className='text-2xl text-blue-500 font-semibold'>$20</h2>
-     </div>
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>{captain.vehicle.name}</span>
+              <div className="flex items-center space-x-1">
+                <MapPin className="w-4 h-4" />
+                <span>{captain.distance}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
+  );
+};
 
-     <div onClick={onSelectCaptain} className='w-[90%] h-32 bg-white p-4 flex m-4 rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-20 h-14 rounded-full pr-2 mt-6' src='profile.webp'></img></div>
-     <div className='flex flex-col mt-5'>
-     <h2 className='text-blue-500 text-lg font-semibold'>Captain-1</h2>
-     <h2 className='text-md text-blue-500 font-semibold'>0.2km . 2min away</h2>
-     </div>
-     <div className='mt-8'>
-      <h2 className='text-2xl text-blue-500 font-semibold'>$20</h2>
-     </div>
-    </div>
-    
-   </div>
-   
-  )
-}
-
-export default AvailableRide
+export default AvailableRide;

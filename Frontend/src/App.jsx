@@ -12,9 +12,11 @@ import Ride from './pages/Ride'
 import Drive from './pages/Drive'
 import About from './pages/About'
 import Support from './pages/Support'
-import UserProfile from './pages/UserProfile'
+// import UserProfile from './pages/UserProfile'
 import UserNotification from './pages/UserNotification'
 import RideTracking from './pages/RideTracking'
+import MapComponent from './components/MapComponent'
+import PrivateRoute from './components/PrivateRoute'
 
 
 function App() {
@@ -26,15 +28,16 @@ function App() {
         <Route path='/Captainlogin' element={<Captainlogin/>}/>
         <Route path='/UserSignup' element={<UserSignup/>}/>
         <Route path='/Userlogin' element={<Userlogin/>}/>
-        <Route path='/UserHome' element={<UserHome/>}/>
-        <Route path='/CaptainHome' element={<CaptainHome/>}/>
+      <Route path='/UserHome' element={<PrivateRoute> <UserHome/></PrivateRoute>}/>
+      <Route path='/CaptainHome' element={<PrivateRoute> <CaptainHome/></PrivateRoute>}/>
         <Route path='/RideTracking' element={<RideTracking/>}/>
         <Route path='/Ride' element={<Ride/>}/>
         <Route path='/Drive' element={<Drive/>}/>
         <Route path='/UserNotification' element={<UserNotification/>}/>
         <Route path='/About' element={<About/>}/>
         <Route path='/Support' element={<Support/>}/>
-        <Route path='/UserProfile' element={<UserProfile/>}/>
+        {/* <Route path='/UserProfile' element={<PrivateRoute><UserProfile/></PrivateRoute>}/> */}
+        <Route path='/MapComponent' element={<MapComponent/>}/>
       </Routes>
     </>
   )

@@ -4,7 +4,6 @@ const { validationResult } = require('express-validator')
 const blacklistTokenModel = require('../Models/blacklistToken.model')
 
 
-
 module.exports.registerCaptain = async (req, res, next) => {
 
    const errors = validationResult(req);
@@ -70,10 +69,40 @@ module.exports.loginCaptain = async (req, res, next) => {
    res.status(201).json({ token, captain });
 }
 
+module.exports.getAvailableCaptain = async (req, res, next) => {
+  try {
+    const captains = await captainModel.find({
+      status: 'inactive'
+    });
+
+    res.status(200).json(captains);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch captains", error: err.message });
+  }
+};
+
+module.exports.getCaptainDetail = async (req, res, next) => {
+   try {
+    const captain = await captainModel.findOne({ email: req.params.email });
+    if (!captain) return res.status(404).json({ message: 'Captain not found' });
+    res.status(200).json(captain);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+}
 
 module.exports.getCaptainProfile = async (req, res, next) => {
-   res.status(200).json(req.captain);
-   console.log(req.captain)
+    try {
+    const captain = await userModel.findById(req.captain._id).select("-password");
+     console.log(captain);
+    res.json({
+      firstname: captain.fullname.firstname,
+      lastname: captain.fullname.lastname,
+      email: captain.email,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch profile" });
+  }
 }
 
 module.exports.logoutCaptain = async (req, res, next) => {

@@ -1,47 +1,74 @@
-import React from 'react'
-import {useState} from 'react'
-import AvailableRide from './AvailableRide'
+import { Car, Bike, Truck, CheckCircle } from 'lucide-react';
 
-const RideType = ({onSelectRide}) => {
-
-  const [IsClick, setIsClick] = useState(false)
+const RideType = ({ onSelectRide, data }) => {
+  const rideTypes = [
+    {
+      id: 'bike',
+      name: 'Bike',
+      icon: <Bike className="w-8 h-8" />,
+      price: 25,
+      time: '2-5 min',
+      description: 'Affordable rides on two wheels'
+    },
+    {
+      id: 'auto',
+      name: 'Auto',
+      icon: <Truck className="w-8 h-8" />,
+      price: 45,
+      time: '3-8 min',
+      description: 'Quick and comfortable auto rides'
+    },
+    {
+      id: 'car',
+      name: 'Car',
+      icon: <Car className="w-8 h-8" />,
+      price: 85,
+      time: '5-12 min',
+      description: 'Premium car rides with AC'
+    }
+  ];
 
   return (
-    <div className='bg-white w-full h-full p-6 flex flex-col justify-between'>
+    <div className="bg-white p-4 h-full overflow-y-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-800">Choose a Ride</h3>
+        <span className="text-sm text-gray-500">
+          {data?.pickup ? `From ${data.pickup.slice(0, 20)}...` : ''}
+        </span>
+      </div>
 
-  <div onClick={onSelectRide} className='w-full h-10 bg-white flex justify-center align-middle'>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" color="#3B82F6" fill="none">
-    <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
- </svg>
-  </div>
+      <div className="space-y-3">
+        {rideTypes.map((type) => (
+          <div
+            key={type.id}
+            onClick={() => onSelectRide && onSelectRide(type)}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all"
+          >
+            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+              {type.icon}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold text-gray-900">{type.name}</h4>
+                <div className="text-right">
+                  <p className="font-bold text-gray-900">₹{type.price}</p>
+                  <p className="text-sm text-gray-500">{type.time}</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">{type.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
-    <div onClick={onSelectRide} className='w-[90%] h-36 p-4 flex m-4  rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-44 h-28 rounded-2xl pr-2' src='car.webp'></img></div>
-     <div className='flex gap-12 mt-5'>
-     <h2 className='text-blue-500 text-2xl font-semibold'>Car</h2>
-     <h2 className='text-2xl text-blue-500 font-semibold'>$20</h2>
-     </div>
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2 text-sm text-blue-700">
+          <CheckCircle className="w-4 h-4" />
+          <span>All rides include GPS tracking and 24/7 support</span>
+        </div>
+      </div>
     </div>
+  );
+};
 
-     <div onClick={onSelectRide} className='w-[90%] h-36 p-4 flex m-4  rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-28 h-20 rounded-2xl' src='bike.webp'></img></div>
-     <div className='flex gap-12 mt-5'>
-     <h2 className='text-blue-500 text-2xl font-semibold'>Bike</h2>
-     <h2 className='text-2xl text-blue-500 font-semibold'>$10</h2>
-     </div>
-    </div>
-
-     <div onClick={onSelectRide} className='w-[90%] h-36 p-4 flex m-4  rounded-lg border-2 hover:border-blue-500 justify-between'>
-     <div><img className='w-24 h-14 rounded-2xl mt-3' src='Auto.webp'></img></div>
-     <div className='flex gap-12 mt-5'>
-     <h2 className='text-blue-500 text-2xl font-semibold'>Auto</h2>
-     <h2 className='text-2xl text-blue-500 font-semibold'>$15</h2>
-     </div>
-    </div>
- 
-    {/* {IsClick && <AvailableRide/>} */}
-    </div>
-  )
-}
-
-export default RideType
+export default RideType;

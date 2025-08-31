@@ -54,7 +54,9 @@ module.exports.loginUser = async(req, res, next) => {
 
  const token = user.generateAuthToken();
 
- res.cookie('token',token)
+//  res.cookie('token',token)
+
+//  localStorage.setItem("auth", JSON.stringify({ token: res.data.token }));
 
  res.status(201).json({ token, user});
 }
@@ -62,10 +64,11 @@ module.exports.loginUser = async(req, res, next) => {
 module.exports.getUserProfile = async (req, res, next) => {
 //  res.status(200).json(req.user);
  try {
-    const user = await user.findById(req.user.id).select("-password");
-
+    const user = await userModel.findById(req.user._id).select("-password");
+     console.log(user);
     res.json({
-      name: user.name,
+      firstname: user.fullname.firstname,
+      lastname: user.fullname.lastname,
       email: user.email,
     });
   } catch (err) {

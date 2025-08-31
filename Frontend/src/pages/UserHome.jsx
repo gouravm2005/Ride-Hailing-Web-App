@@ -1,93 +1,276 @@
-import {React,useState, useRef, useEffect} from "react";
-import { Link } from "react-router-dom";
+import { React, useState, useRef, useEffect } from "react";
 import Navbar2 from "../components/Navbar2"
 import RideType from "../components/RideType"
 import Location from "../components/Location"
-import gsap from 'gsap'
-import {useGSAP} from '@gsap/react'
 import AvailableRide from "../components/AvailableRide";
 import CaptainDetail from "../components/CaptainDetail";
+import MapComponent from "../components/MapComponent";
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import {
+  ArrowLeft,
+} from 'lucide-react';
 
-const main = () => {
- const [pickup, setpickup] = useState('')
- const [destination, setdestination] = useState('')
- const [Data, setData] = useState('')
- const [panelOpen, setpanelOpen] = useState(false)
- const [panelClosed, setpanelClosed] = useState(false)
- const [FormFilled, setFormFilled] = useState(false)
- const [panelStep, setPanelStep] = useState('suggestions'); 
- const panelRef = useRef(null)
+const UserHome = () => {
+  const [pickup, setPickup] = useState('');
+  const [destination, setDestination] = useState('');
+  const [data, setData] = useState(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [formFilled, setFormFilled] = useState(false);
+  const [panelStep, setPanelStep] = useState('suggestions');
+  const [selectedRideType, setSelectedRideType] = useState(null);
+  const [selectedCaptain, setSelectedCaptain] = useState(null);
+  const [isFormCompact, setIsFormCompact] = useState(false);
 
- const submitHandler = (e) => {
-  e.preventDefault()
-  setData({
-   pickup:pickup,
-   destination:destination
-  })
- }
+  const panelRef = useRef(null);
 
- useGSAP(function(){
-  if (panelOpen) {
-     gsap.to(panelRef.current,{
-     height:'66%'
-  })
- }
- else{
-  gsap.to(panelRef.current,{
-  height:'0%'
-  })
- }
- },[panelOpen])
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setData({
+      pickup: pickup,
+      destination: destination
+    });
+  };
+
+  useGSAP(() => {
+    if (panelOpen) {
+      gsap.to(panelRef.current, {
+        height: '50%',
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    } else {
+      gsap.to(panelRef.current, {
+        height: '0%',
+        duration: 0.3,
+        ease: "power2.in"
+      });
+    }
+  }, [panelOpen]);
 
   useEffect(() => {
-    // Check if both fields are filled
     if (pickup.trim() !== '' && destination.trim() !== '') {
       setFormFilled(true);
-      setPanelStep('RideType')
+      setIsFormCompact(true);
     } else {
       setFormFilled(false);
-      setPanelStep(true)
+      setIsFormCompact(false);
+      setPanelStep('suggestions');
     }
   }, [pickup, destination]);
 
- return(
- <div className=' h-screen w-screen relative overflow-auto'>
-  <Navbar2/>
-  <div className='h-full w-full'>
-  <div className="h-[80%] w-full md:w-1/2 md:h-[80%] md:absolute md:right-40 md:top-28 bg-cover bg-center bg-no-repeat bg-[url('https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif')]"></div>
-  <div className={`w-full h-[35%] p-4 bg-white flex flex-col gap-4 absolute bottom-0 md:top-36 md:w-[30%] md:h-[50%] md:pl-20 md:mt-20 ${
-            panelOpen
-              ? "top-4 z-1 h-[32%] md:w-full md:h-[28%] md:top-3"
-              : "bottom-0 md:top-36 md:pl-20 md:mt-20"
-          }`}>
-   {panelOpen && (
-              <div className="absolute top-0 ">
-                <svg onClick={()=>{setpanelOpen(false)}} xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="#3B82F6" color="#3B82F6">
-<path d="M8.2929 17.7071C8.68342 18.0976 9.31659 18.0976 9.70711 17.7071C10.0976 17.3166 10.0976 16.6834 9.7071 16.2929L6.41419 13L20 13C20.5523 13 21 12.5523 21 12C21 11.4477 20.5523 11 20 11L6.41423 11L9.70707 7.7071C10.0976 7.31657 10.0976 6.68341 9.70706 6.29289C9.31653 5.90237 8.68337 5.90237 8.29285 6.2929L3.29823 11.2876C3.27977 11.3058 3.26202 11.3247 3.24501 11.3442C3.17745 11.4219 3.12387 11.5074 3.08425 11.5976C3.03045 11.7199 3.00042 11.855 3 11.997L3 12C3 12.0031 3.00001 12.0062 3.00004 12.0093C3.00118 12.135 3.02554 12.2553 3.06904 12.3659C3.11782 12.4902 3.19243 12.6067 3.2929 12.7071L8.2929 17.7071Z" fill="#3B82F6"></path>
-</svg>
+  // const handleLocationSelect = (location) => {
+  //   // Logic to set pickup or destination based on which field was last focused
+  //   if (!pickup) {
+  //     setPickup(location.name);
+  //   } else if (!destination) {
+  //     setDestination(location.name);
+  //   }
+  // };
+
+  const handleRideSelect = (rideType) => {
+    setSelectedRideType(rideType);
+    setPanelStep('availableRide');
+  };
+
+  const handleCaptainSelect = (email) => {
+    setSelectedCaptain(email);
+    setPanelStep('captainDetail');
+  };
+
+  const handleConfirmRide = () => {
+    alert('Ride confirmed! Your driver will arrive soon.');
+    // Reset to initial state or navigate to tracking page
+  };
+
+  const handleCancelRide = () => {
+    setPanelStep('availableRide');
+    setSelectedCaptain(null);
+  };
+
+  const handleSeeRides = () => {
+    if (formFilled) {
+      setPanelStep('RideType');
+      setPanelOpen(true);
+    }
+  };
+
+  return (
+    <div className="h-screen w-screen relative overflow-hidden bg-gray-50">
+      <Navbar2 />
+
+      <div className="h-full w-full flex flex-col md:flex-row">
+        {/* Map Section */}
+        <div className="h-1/2 md:h-full md:flex-1 relative">
+          <MapComponent
+            showRoute={formFilled}
+            pickup={pickup}
+            destination={destination}
+          />
+        </div>
+
+        {/* Form Section */}
+        <div className={`
+          w-full md:w-96 bg-white shadow-2xl relative z-10
+          ${isFormCompact ? 'h-auto' : 'h-1/2 md:h-full'}
+          transition-all duration-300 ease-in-out
+          flex flex-col
+        `}>
+          {/* Back button for mobile when panel is open */}
+          {panelOpen && (
+            <div className="absolute top-4 left-4 z-50 md:hidden">
+              <button
+                onClick={() => setPanelOpen(false)}
+                className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+              >
+                <ArrowLeft className="w-6 h-6 text-blue-600" />
+              </button>
+            </div>
+          )}
+
+          {/* Form Header and Inputs */}
+          <div className={`
+            p-4 md:p-6 bg-white
+            ${isFormCompact ? 'border-b border-gray-200' : ''}
+            transition-all duration-300
+          `}>
+            <h3 className={`
+              font-bold text-blue-600 mb-4 md:mb-6
+              ${isFormCompact ? 'text-xl' : 'text-3xl md:text-4xl'}
+              transition-all duration-300
+            `}>
+              Find a trip
+            </h3>
+
+            <form onSubmit={submitHandler} className="space-y-4">
+              <div className="relative">
+                <div className="absolute left-4 top-6 w-1 h-12 bg-gray-300"></div>
+                <div className="absolute left-3.5 top-4 w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="absolute left-3.5 top-14 w-2 h-2 bg-red-500 rounded-full"></div>
+                <input
+                  onFocus={() => setPanelStep("pickup")}
+                  className="w-full h-12 rounded-lg bg-gray-100 mb-4 pl-10 pr-4 border border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
+                  value={pickup}
+                  onChange={(e) => setPickup(e.target.value)}
+                  type="text"
+                  placeholder="Pickup location"
+                />
+
+                {panelStep === "pickup" && (
+                  <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto z-50">
+                    <Location onLocationSelect={(loc) => {
+                      setPickup(loc.name);
+                      setPanelStep(null);
+                    }} />
+                  </div>
+                )}
               </div>
+
+              {/* Destination */}
+              <div className="relative">
+                <input
+                  onFocus={() => setPanelStep("destination")}
+                  className="w-full h-12 rounded-lg bg-gray-100 pl-10 pr-4 border border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  type="text"
+                  placeholder="Destination"
+                />
+
+                {panelStep === "destination" && (
+                  <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto z-50">
+                    <Location onLocationSelect={(loc) => {
+                      setDestination(loc.name);
+                      setPanelStep(null);
+                    }} />
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSeeRides}
+                disabled={!formFilled}
+                className={`
+                  w-full h-12 rounded-lg font-semibold text-white transition-all duration-300
+                  ${formFilled
+                    ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer transform hover:scale-[1.02]'
+                    : 'bg-gray-400 cursor-not-allowed'
+                  }
+                  ${isFormCompact ? 'text-base' : 'text-lg'}
+                `}
+              >
+                {formFilled ? 'See Rides' : 'Enter pickup & destination'}
+              </button>
+            </form>
+          </div>
+
+          {/* Expandable Panel Content */}
+          {!panelOpen && isFormCompact && (
+            <div className="flex-1 p-4 bg-gray-50">
+              <p className="text-gray-600 text-center">
+                Click "See Rides" to view available options
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Panel for Mobile / Side Panel Content */}
+      <div
+        ref={panelRef}
+        className="absolute bottom-0 w-full z-40 bg-white shadow-2xl md:hidden overflow-hidden"
+        style={{ height: '0%' }}
+      >
+        {/* {panelStep === 'suggestions' && (
+          <Location onLocationSelect={handleLocationSelect} />
+        )} */}
+        {panelStep === 'RideType' && (
+          <RideType onSelectRide={handleRideSelect} data={data} />
+        )}
+        {panelStep === 'availableRide' && (
+          <AvailableRide
+            onSelectCaptain={handleCaptainSelect}
+            selectedRideType={selectedRideType}
+          />
+        )}
+        {panelStep === 'captainDetail' && (
+          <CaptainDetail
+            email={selectedCaptain}
+            onConfirm={handleConfirmRide}
+            onCancel={handleCancelRide}
+          />
+        )}
+      </div>
+
+      {/* Desktop Panel Content */}
+      <div className="hidden md:block">
+        {panelOpen && (
+          <div className="fixed right-0 top-14 w-96 h-[calc(100vh-3.5rem)] bg-white shadow-2xl z-30 border-l border-gray-200">
+            {panelStep === 'suggestions' && (
+              <Location onLocationSelect={handleLocationSelect} />
             )}
-   <h3 className='w-full h-15 pt-5 text-4xl md:text-6xl font-medium text-blue-400 pb-6'>Find a trip</h3>
-   <form className='relative' onSubmit={submitHandler}>
-   <div className='h-16 w-1 bg-black absolute top-7 left-5 md:top-7 md:left-5'></div>
-   <input onClick={(e)=>{setpanelOpen(true)}} className='w-full h-12 rounded-md bg-gray-200 mb-5 pl-10' value={pickup} onChange={(e)=>{setpickup(e.target.value)}} type="text" placeholder="Add a Pickup location" />
-   <input onClick={(e)=>{setpanelOpen(true)}} className='w-full h-12 rounded-md bg-gray-200 pl-10' value={destination} onChange={(e)=>{setdestination(e.target.value)}} type="text" placeholder="Add destination location" />
-  <button onClick={(e)=>{setpanelOpen(true)}} className="w-1/3 h-12 shadow-sm mt-4 rounded-md text-lg font-medium text-white bg-blue-500">See Rides</button>
-   </form>
-  </div>
+            {panelStep === 'RideType' && (
+              <RideType onSelectRide={handleRideSelect} data={data} />
+            )}
+            {panelStep === 'availableRide' && (
+              <AvailableRide
+                onSelectCaptain={handleCaptainSelect}
+                selectedRideType={selectedRideType}
+              />
+            )}
+            {panelStep === 'captainDetail' && (
+              <CaptainDetail
+                email={selectedCaptain}
+                onConfirm={handleConfirmRide}
+                onCancel={handleCancelRide}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
-  <div ref={panelRef} className='absolute h-[0%] w-full bottom-0 z-0 '>
-  {panelOpen && !FormFilled && <Location />}
-  {/* {panelOpen && FormFilled && <RideType />} */}
-  {panelStep === 'suggestions' && <Location />}
-  {panelStep === 'RideType' && <RideType onSelectRide={() => setPanelStep('availableRide')} />}
-  {panelStep === 'availableRide' && <AvailableRide onSelectCaptain={() => setPanelStep('captainDetail')} />}
-  {panelStep === 'captainDetail' && <CaptainDetail />}
-  </div>
-
-  </div>
- </div>
- )
-}
-
-export default main;
+export default UserHome;

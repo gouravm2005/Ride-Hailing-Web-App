@@ -22,10 +22,11 @@ const Captainlogin = () => {
    setpassword('')
 
   try {
-    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/Captain/login`, CaptainData);
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/captain/login`, CaptainData);
 
     if (response.status === 201) {
       console.log('Signup success:', response.data);
+      localStorage.setItem("auth", JSON.stringify({ token : response.data.token, role:'captain'}))
       navigate('/CaptainHome');
     }
   } catch (err) {

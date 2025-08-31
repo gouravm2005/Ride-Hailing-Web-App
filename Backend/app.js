@@ -8,19 +8,22 @@ const captainRoutes = require('./Routes/captain.route');
 const cookiesParser = require('cookie-parser');
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  // origin: 'http://localhost:5173',  // your frontend origin
+  // credentials: true  
+ }              // allow cookies to be sent
+))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 app.use(cookiesParser())
 
 connectToDB();
 
+app.use('/api/user', userRoutes);
+
+app.use('/api/captain', captainRoutes)
+
 app.get('/',(req,res)=>{
  res.send("Hello");
 })
-
-app.use('/user', userRoutes);
-
-app.use('/captain', captainRoutes)
-
 module.exports = app;

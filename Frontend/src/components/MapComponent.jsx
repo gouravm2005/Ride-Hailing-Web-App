@@ -2,7 +2,8 @@ import { Navigation } from 'lucide-react';
 
 const MapComponent = ({ showRoute, pickup, destination }) => {
   return (
-    <div className="h-full w-full bg-cover bg-center bg-no-repeat relative bg-[url('https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif')]">
+    <div className='h-full w-full md:pb-12 flex justify-center items-center'>
+    <div className="h-[90%] w-[90%] bg-cover bg-center border-b rounded-md bg-no-repeat relative bg-[url('https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif')]">
       <div className="absolute inset-0 bg-black/10"></div>
 
       {/* Location markers */}
@@ -30,6 +31,7 @@ const MapComponent = ({ showRoute, pickup, destination }) => {
           )}
         </div>
       )}
+    </div>
     </div>
   );
 };

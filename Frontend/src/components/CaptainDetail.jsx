@@ -16,7 +16,6 @@ const CaptainDetail = ({ email, onConfirm, onCancel }) => {
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/captain/getCaptainDetail/${email}`
         );
-        console.log("Fetched captain:", res.data);
         setCaptain(res.data);
         hasFetched.current = true;
       } catch (err) {
@@ -31,13 +30,6 @@ const CaptainDetail = ({ email, onConfirm, onCancel }) => {
     }
   }, [email]);
 
-  console.log("Render check:", {
-    loading,
-    captain,
-    fullname: captain?.fullname,
-    firstname: captain?.fullname?.firstname,
-  });
-
   const paymentMethods = [
     { id: 'cash', name: 'Cash', icon: '💵' },
     { id: 'card', name: 'Credit/Debit Card', icon: '💳' },
@@ -46,7 +38,7 @@ const CaptainDetail = ({ email, onConfirm, onCancel }) => {
   ];
 
   return (
-    <div className="bg-white p-4 h-full overflow-y-auto">
+    <div className="bg-white p-6 h-full overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Trip Details</h3>
         <button onClick={onCancel} className="p-2 hover:bg-gray-100 rounded-full">

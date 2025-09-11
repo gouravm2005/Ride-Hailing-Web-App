@@ -20,11 +20,11 @@ function Navbar2() {
   const handleProfileToggle = () => setIsProfileOpen(!isProfileOpen);
 
   return (
-    <div className='w-screen h-20 flex justify-between bg-white text-blue-600 border-b-2 border-gray-300'>
-      <div className='flex gap-4 pt-5 p-3 text-xl font-normal'>
-        <div className='w-30 h-16 text-3xl font-bold flex gap-2 '>
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <Car className="w-6 h-6 text-white" />
+    <div className='w-screen h-16 flex justify-between bg-white text-blue-600 border-b-2 border-gray-300'>
+      <div className='flex gap-4 pl-3 text-xl pt-4 font-normal'>
+        <div className='w-30 h-16 text-2xl font-bold flex gap-2 '>
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <Car className="w-5 h-5 text-white" />
           </div>
           <h1 className='text-blue-600'>RideGo</h1>
         </div>
@@ -41,7 +41,7 @@ function Navbar2() {
           className="w-10 h-10 rounded-full cursor-pointer"
         >
           <img
-            className="w-10 h-10 rounded-full border"
+            className="w-9 h-9 rounded-full border"
             src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
             alt="Profile"
           />
@@ -85,7 +85,7 @@ function Navbar2() {
           </svg>
         </div>
         {menuOpen && (
-          <div onClick={handleMenu} className="md:hidden flex flex-col gap-4 items-start text-3xl font-bold bg-white text-blue-400 w-screen h-screen fixed z-10 top-16 left-56 pt-8 pl-8">
+          <div onClick={handleMenu} className="md:hidden flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[40%] h-screen fixed z-10 top-16 right-0 pt-8 pl-8">
             <h3><Link to='/UserHome'>Ride</Link></h3>
             <h3><Link to='/UserNotification'>Notification</Link></h3>
             <h3><Link to='/About'>About</Link></h3>

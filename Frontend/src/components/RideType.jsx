@@ -1,6 +1,7 @@
 import { Car, Bike, Truck, CheckCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
-const RideType = ({ onSelectRide, data }) => {
+const RideType = ({ onSelectRide, data, panelOpen }) => {
   const rideTypes = [
     {
       id: 'bike',
@@ -29,7 +30,7 @@ const RideType = ({ onSelectRide, data }) => {
   ];
 
   return (
-    <div className="bg-white p-4 h-full overflow-y-auto">
+    <div className="bg-white pl-6 pr-6 mt-16 h-full overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Choose a Ride</h3>
         <span className="text-sm text-gray-500">
@@ -41,7 +42,7 @@ const RideType = ({ onSelectRide, data }) => {
         {rideTypes.map((type) => (
           <div
             key={type.id}
-            onClick={() => onSelectRide && onSelectRide(type)}
+            onClick={() => onSelectRide && onSelectRide(type.name)}
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all"
           >
             <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
@@ -67,6 +68,16 @@ const RideType = ({ onSelectRide, data }) => {
           <span>All rides include GPS tracking and 24/7 support</span>
         </div>
       </div>
+        {panelOpen && (
+            <div className="w-8 h-8 absolute top-3 z-50">
+              <button
+                onClick={panelOpen}
+                className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+              >
+                <ArrowLeft className="w-6 h-6 text-blue-600" />
+              </button>
+            </div>
+          )}
     </div>
   );
 };

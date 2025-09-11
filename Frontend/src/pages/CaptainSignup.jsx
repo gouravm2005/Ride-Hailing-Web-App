@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState, useContext } from 'react'
 import { CaptainContext, CaptainDataContext } from '../context/CaptainContext'
 import axios from 'axios'
+import { Car } from "lucide-react";
 
 const CaptainSignup = () => {
   const [email, setemail] = useState('')
@@ -41,7 +42,7 @@ const CaptainSignup = () => {
       if (response.status === 201) {
         console.log('Signup success:', response.data);
         const token = response.data.token;
-        localStorage.setItem("auth", JSON.stringify({ token: token, role:'captain' }));
+        localStorage.setItem("auth", JSON.stringify({ token: token, role: 'captain' }));
         navigate('/CaptainHome');
       }
     } catch (err) {
@@ -60,7 +61,12 @@ const CaptainSignup = () => {
 
   return (
     <div>
-      <div className='w-screen h-14 bg-blue-500 text-white text-lg font-medium pl-5 pt-3 pb-4'>RideGo</div>
+      <div className='w-screen h-14 bg-gray-200 text-xl flex gap-2 font-medium pl-5 pt-3 pb-4'>
+        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+          <Car className="w-5 h-5 text-white" />
+        </div>
+        <h2 className='text-2xl font-bold  text-blue-600'>RideGo</h2>
+      </div>
       <form className='w-screen h-screen flex flex-col items-center p-10 gap-5 pt-20' onSubmit={submitHandler}>
 
         <h3 className='w-64 text-xl font-medium'>What's your Name</h3>

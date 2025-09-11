@@ -1,8 +1,9 @@
 import { MapPin, Star, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 
-const AvailableRide = ({ onSelectCaptain, selectedRideType }) => {
+const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
   const [mockCaptains, setmockCaptains] = useState([]);
 
   useEffect(() => {
@@ -17,7 +18,7 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType }) => {
   }, [])
 
   return (
-    <div className="bg-white p-4 h-full overflow-y-auto">
+    <div className="bg-white pl-6 pr-6 mt-16 h-full overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Available Drivers</h3>
         <span className="text-sm text-gray-500">{mockCaptains.length} nearby</span>
@@ -60,6 +61,16 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType }) => {
           </div>
         ))}
       </div>
+        {panelOpen && (
+            <div className="w-8 h-8 absolute top-3 z-50">
+              <button
+                onClick={panelOpen}
+                className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+              >
+                <ArrowLeft className="w-6 h-6 text-blue-600" />
+              </button>
+            </div>
+          )}
     </div>
   );
 };

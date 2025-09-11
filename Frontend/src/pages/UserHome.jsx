@@ -7,9 +7,8 @@ import CaptainDetail from "../components/CaptainDetail";
 import MapComponent from "../components/MapComponent";
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import {
-  ArrowLeft,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import axios from "axios";
 
 const UserHome = () => {
   const [pickup, setPickup] = useState('');
@@ -21,16 +20,10 @@ const UserHome = () => {
   const [selectedRideType, setSelectedRideType] = useState(null);
   const [selectedCaptain, setSelectedCaptain] = useState(null);
   const [isFormCompact, setIsFormCompact] = useState(false);
+  const [pickuplnglat, setpickuplnglat] = useState({});
+  const [destinationlnglat, setdestinationlnglat] = useState({})
 
   const panelRef = useRef(null);
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-    setData({
-      pickup: pickup,
-      destination: destination
-    });
-  };
 
   useGSAP(() => {
     if (panelOpen) {
@@ -59,22 +52,62 @@ const UserHome = () => {
     }
   }, [pickup, destination]);
 
-  // const handleLocationSelect = (location) => {
-  //   // Logic to set pickup or destination based on which field was last focused
-  //   if (!pickup) {
-  //     setPickup(location.name);
-  //   } else if (!destination) {
-  //     setDestination(location.name);
-  //   }
-  // };
+ 
+const updateCaptainLocation = async (
+  pickup,
+  pickuplnglat,
+  destination,
+  destinationlnglat
+) => {
+  try {
+    console.log("Sending:", { pickup, pickuplnglat, destination, destinationlnglat });
+    const res = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/api/ride/updateCaptainLocation`,
+      { pickup, pickuplnglat, destination, destinationlnglat }
+    );
+    console.log("Captains updated:", res.data);
+  } catch (err) {
+    console.error("Error updating captains:", err);
+  }
+};
+
+// handle suggestion selection
+const handleLocationSelect = (loc) => {
+  if (panelStep === "pickup") {
+    setPickup(loc.name);
+    setpickuplnglat({ lng: loc.lon, lat: loc.lat });
+  } else if (panelStep === "destination") {
+    setDestination(loc.name);
+    setdestinationlnglat({ lng: loc.lon, lat: loc.lat });
+  }
+
+  // close suggestion panel
+  setPanelStep(null);
+
+  // call backend with all values (including updated one)
+  updateCaptainLocation(
+    panelStep === "pickup" ? loc.name : pickup,
+    panelStep === "pickup" ? { lng: loc.lon, lat: loc.lat } : pickuplnglat,
+    panelStep === "destination" ? loc.name : destination,
+    panelStep === "destination" ? { lng: loc.lon, lat: loc.lat } : destinationlnglat
+  );
+};
+
+// handle form submit when user typed manually
+const submitHandler = (e) => {
+  e.preventDefault();
+  updateCaptainLocation(pickup, pickuplnglat, destination, destinationlnglat);
+};
 
   const handleRideSelect = (rideType) => {
     setSelectedRideType(rideType);
+     setPanelOpen(true);
     setPanelStep('availableRide');
   };
 
   const handleCaptainSelect = (email) => {
     setSelectedCaptain(email);
+     setPanelOpen(true);
     setPanelStep('captainDetail');
   };
 
@@ -111,32 +144,21 @@ const UserHome = () => {
 
         {/* Form Section */}
         <div className={`
-          w-full md:w-96 bg-white shadow-2xl relative z-10
-          ${isFormCompact ? 'h-auto' : 'h-1/2 md:h-full'}
+          w-full md:w-96 bg-white shadow-xl relative z-10
+          ${isFormCompact ? 'md:h-[85%] md:mt-8 md:p-3 md:mr-4 border-gray-400 rounded-md' : 'h-1/2 md:h-[85%] md:mt-8 md:p-3 md:mr-4 border-gray-400 rounded-md'}
           transition-all duration-300 ease-in-out
           flex flex-col
         `}>
-          {/* Back button for mobile when panel is open */}
-          {panelOpen && (
-            <div className="absolute top-4 left-4 z-50 md:hidden">
-              <button
-                onClick={() => setPanelOpen(false)}
-                className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
-              >
-                <ArrowLeft className="w-6 h-6 text-blue-600" />
-              </button>
-            </div>
-          )}
 
           {/* Form Header and Inputs */}
           <div className={`
-            p-4 md:p-6 bg-white
+            p-6 md:p-6 bg-white
             ${isFormCompact ? 'border-b border-gray-200' : ''}
             transition-all duration-300
           `}>
             <h3 className={`
               font-bold text-blue-600 mb-4 md:mb-6
-              ${isFormCompact ? 'text-xl' : 'text-3xl md:text-4xl'}
+              ${isFormCompact ? 'text-3xl' : 'text-3xl md:text-4xl'}
               transition-all duration-300
             `}>
               Find a trip
@@ -158,10 +180,13 @@ const UserHome = () => {
 
                 {panelStep === "pickup" && (
                   <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto z-50">
-                    <Location onLocationSelect={(loc) => {
-                      setPickup(loc.name);
-                      setPanelStep(null);
-                    }} />
+                    <Location
+                      query={pickup}  
+                      onLocationSelect={(loc) => {
+                        setPickup(loc.name); 
+                        setPanelStep(null);
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -179,10 +204,13 @@ const UserHome = () => {
 
                 {panelStep === "destination" && (
                   <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-48 overflow-y-auto z-50">
-                    <Location onLocationSelect={(loc) => {
-                      setDestination(loc.name);
-                      setPanelStep(null);
-                    }} />
+                    <Location
+                      query={destination} 
+                      onLocationSelect={(loc) => {
+                        setDestination(loc.name);
+                        setPanelStep(null);
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -222,16 +250,17 @@ const UserHome = () => {
         className="absolute bottom-0 w-full z-40 bg-white shadow-2xl md:hidden overflow-hidden"
         style={{ height: '0%' }}
       >
-        {/* {panelStep === 'suggestions' && (
+        {panelStep === 'suggestions' && (
           <Location onLocationSelect={handleLocationSelect} />
-        )} */}
+        )}
         {panelStep === 'RideType' && (
-          <RideType onSelectRide={handleRideSelect} data={data} />
+          <RideType onSelectRide={handleRideSelect} data={data} panelOpen={() => setPanelOpen(false)} />
         )}
         {panelStep === 'availableRide' && (
           <AvailableRide
             onSelectCaptain={handleCaptainSelect}
             selectedRideType={selectedRideType}
+            panelOpen={() => setPanelOpen(false)}
           />
         )}
         {panelStep === 'captainDetail' && (
@@ -246,17 +275,18 @@ const UserHome = () => {
       {/* Desktop Panel Content */}
       <div className="hidden md:block">
         {panelOpen && (
-          <div className="fixed right-0 top-14 w-96 h-[calc(100vh-3.5rem)] bg-white shadow-2xl z-30 border-l border-gray-200">
+          <div className="fixed right-4 top-16 w-[400px] h-[88%] mt-6 bg-white shadow-xl z-30 border-b-2 border-gray-200 rounded-md">
             {panelStep === 'suggestions' && (
               <Location onLocationSelect={handleLocationSelect} />
             )}
             {panelStep === 'RideType' && (
-              <RideType onSelectRide={handleRideSelect} data={data} />
+              <RideType onSelectRide={handleRideSelect} data={data} panelOpen={() => setPanelOpen(false)}/>
             )}
             {panelStep === 'availableRide' && (
               <AvailableRide
                 onSelectCaptain={handleCaptainSelect}
                 selectedRideType={selectedRideType}
+                panelOpen={() => setPanelOpen(false)}
               />
             )}
             {panelStep === 'captainDetail' && (

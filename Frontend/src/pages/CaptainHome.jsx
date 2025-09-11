@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Navbar1 from "../components/Navbar1";
-import { MapPin, CheckCircle, XCircle, Route } from "lucide-react";
+import MapComponent from "../components/MapComponent";
+import { CheckCircle, XCircle, Route } from "lucide-react";
 
 export default function CaptainHome() {
   const [isOnline, setIsOnline] = useState(false);
 
   const dailyStats = {
-    distance: 24.5, // km
+    distance: 24.5,
     accepted: 5,
     rejected: 2,
   };
@@ -15,7 +16,7 @@ export default function CaptainHome() {
     <div className="min-h-screen relative bg-gray-50 p-2 flex flex-col gap-6">
       <Navbar1/>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Captain Dashboard</h1>
+        <h1 className="text-xl pl-2 font-semibold">Captain Dashboard</h1>
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
             {isOnline ? "Online" : "Offline"}
@@ -24,7 +25,7 @@ export default function CaptainHome() {
           <button
             onClick={() => setIsOnline(!isOnline)}
             className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-              isOnline ? "bg-green-500" : "bg-gray-400"
+              isOnline ? "bg-blue-600" : "bg-gray-400"
             }`}
           >
             <div
@@ -64,11 +65,11 @@ export default function CaptainHome() {
       </div>
 
       {/* Map Box */}
-      <div className="rounded-2xl shadow-md bg-white flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md aspect-square bg-gray-200 rounded-xl flex items-center justify-center">
-          <MapPin className="h-12 w-12 text-gray-600" />
+     
+        <div className="w-full h-[600px] aspect-square bg-gray-200 rounded-xl flex items-center justify-center">
+        <MapComponent/>
         </div>
-      </div>
+
     </div>
   );
 }

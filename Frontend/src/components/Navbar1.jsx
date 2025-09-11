@@ -21,11 +21,11 @@ const Navbar1 = () => {
   const handleProfileToggle = () => setIsProfileOpen(!isProfileOpen);
 
   return (
-    <div className="w-screen h-20 flex justify-between bg-white text-blue-600 border-b-2 border-black">
+    <div className="w-screen h-16 flex justify-between bg-white text-blue-600 border-b-2 border-black relative">
       {/* Logo Section */}
-      <div className="w-30 h-20 text-3xl font-bold flex gap-2 items-center">
-        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-          <Car className="w-6 h-6 text-white" />
+      <div className="w-30 h-16 pl-4 text-xl font-bold flex gap-2 items-center">
+        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+          <Car className="w-5 h-5 text-white" />
         </div>
         <h1 className="text-blue-600">RideGo</h1>
       </div>
@@ -36,7 +36,7 @@ const Navbar1 = () => {
           className="w-10 h-10 rounded-full cursor-pointer"
         >
           <img
-            className="w-10 h-10 rounded-full border"
+            className="w-9 h-9 rounded-full border"
             src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
             alt="Profile"
           />
@@ -82,7 +82,7 @@ const Navbar1 = () => {
         </div>
 
         {menuOpen && (
-          <div className="flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-screen md:w-[20%] h-screen fixed z-10 top-20 right-0 pt-8 pl-8 shadow-lg">
+          <div className="flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[50%] md:w-[20%] h-screen absolute z-10 top-16 right-0 pt-8 pl-8 shadow-lg">
             <h3>
               <Link to="/UserHome">Ride</Link>
             </h3>

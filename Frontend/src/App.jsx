@@ -8,8 +8,8 @@ import Userlogin from './pages/Userlogin'
 import Home from './pages/Home'
 import UserHome from './pages/UserHome'
 import CaptainHome from './pages/CaptainHome'
-import Ride from './pages/Ride'
-import Drive from './pages/Drive'
+import UserRides from './pages/UserRides'
+import CaptainRides from './pages/CaptainRides'
 import About from './pages/About'
 import Support from './pages/Support'
 // import UserProfile from './pages/UserProfile'
@@ -31,8 +31,8 @@ function App() {
       <Route path='/UserHome' element={<PrivateRoute> <UserHome/></PrivateRoute>}/>
       <Route path='/CaptainHome' element={<PrivateRoute> <CaptainHome/></PrivateRoute>}/>
         <Route path='/RideTracking' element={<RideTracking/>}/>
-        <Route path='/Ride' element={<Ride/>}/>
-        <Route path='/Drive' element={<Drive/>}/>
+        <Route path='/UserRides' element={<UserRides/>}/>
+        <Route path='/CaptainRides' element={<CaptainRides/>}/>
         <Route path='/UserNotification' element={<UserNotification/>}/>
         <Route path='/About' element={<About/>}/>
         <Route path='/Support' element={<Support/>}/>

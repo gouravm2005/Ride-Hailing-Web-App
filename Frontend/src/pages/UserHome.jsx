@@ -52,7 +52,32 @@ const UserHome = () => {
     }
   }, [pickup, destination]);
 
+
+const requestRide = async () => {
+ try {
+ const auth = JSON.parse(localStorage.getItem("auth"));
+ if(!auth || !auth.token) return;
+
+ console.log(pickuplnglat);
+ console.log(destinationlnglat);
  
+ const res = await axios.post(
+  `${import.meta.env.VITE_BASE_URL}/api/ride/requestRide`,
+  {
+    captainId: selectedCaptain,
+    pickup,
+    destination,
+    pickuplnglat,
+    destinationlnglat,
+    rideType: selectedRideType
+  },
+  { headers: { Authorization: `Bearer ${auth.token}` } }
+);
+ } catch (err) {
+  console.error("Error:", err);
+ }
+}
+
 const updateCaptainLocation = async (
   pickup,
   pickuplnglat,
@@ -96,6 +121,12 @@ const handleLocationSelect = (loc) => {
 // handle form submit when user typed manually
 const submitHandler = (e) => {
   e.preventDefault();
+
+console.log("pickup:", pickup);
+console.log("pickuplnglat:", pickuplnglat);
+console.log("destination:", destination);
+console.log("destinationlnglat:", destinationlnglat);
+  
   updateCaptainLocation(pickup, pickuplnglat, destination, destinationlnglat);
 };
 
@@ -105,14 +136,15 @@ const submitHandler = (e) => {
     setPanelStep('availableRide');
   };
 
-  const handleCaptainSelect = (email) => {
-    setSelectedCaptain(email);
+  const handleCaptainSelect = (capId) => {
+    setSelectedCaptain(capId);
      setPanelOpen(true);
     setPanelStep('captainDetail');
   };
 
   const handleConfirmRide = () => {
     alert('Ride confirmed! Your driver will arrive soon.');
+    requestRide();
     // Reset to initial state or navigate to tracking page
   };
 
@@ -173,7 +205,7 @@ const submitHandler = (e) => {
                   onFocus={() => setPanelStep("pickup")}
                   className="w-full h-12 rounded-lg bg-gray-100 mb-4 pl-10 pr-4 border border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
                   value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
+                  onChange={(e) => {setPickup(e.target.value),setpickuplnglat({lng:0, lat:0})}}
                   type="text"
                   placeholder="Pickup location"
                 />
@@ -184,6 +216,7 @@ const submitHandler = (e) => {
                       query={pickup}  
                       onLocationSelect={(loc) => {
                         setPickup(loc.name); 
+                        setpickuplnglat({ lng: loc.lon, lat: loc.lat });
                         setPanelStep(null);
                       }}
                     />
@@ -197,7 +230,7 @@ const submitHandler = (e) => {
                   onFocus={() => setPanelStep("destination")}
                   className="w-full h-12 rounded-lg bg-gray-100 pl-10 pr-4 border border-gray-200 focus:border-blue-500 focus:outline-none transition-colors"
                   value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
+                  onChange={(e) => {setDestination(e.target.value), setdestinationlnglat({lng:0, lat:0})}}
                   type="text"
                   placeholder="Destination"
                 />
@@ -208,6 +241,7 @@ const submitHandler = (e) => {
                       query={destination} 
                       onLocationSelect={(loc) => {
                         setDestination(loc.name);
+                        setdestinationlnglat({ lng: loc.lon, lat: loc.lat });
                         setPanelStep(null);
                       }}
                     />
@@ -216,7 +250,7 @@ const submitHandler = (e) => {
               </div>
 
               <button
-                type="button"
+                type="submit"
                 onClick={handleSeeRides}
                 disabled={!formFilled}
                 className={`
@@ -265,7 +299,7 @@ const submitHandler = (e) => {
         )}
         {panelStep === 'captainDetail' && (
           <CaptainDetail
-            email={selectedCaptain}
+            capId={selectedCaptain}
             onConfirm={handleConfirmRide}
             onCancel={handleCancelRide}
           />
@@ -291,7 +325,7 @@ const submitHandler = (e) => {
             )}
             {panelStep === 'captainDetail' && (
               <CaptainDetail
-                email={selectedCaptain}
+                capId={selectedCaptain}
                 onConfirm={handleConfirmRide}
                 onCancel={handleCancelRide}
               />

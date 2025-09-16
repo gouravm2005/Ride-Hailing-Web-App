@@ -28,7 +28,7 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
         {mockCaptains.map((captain) => (
           <div
             key={captain.id}
-            onClick={() => onSelectCaptain && onSelectCaptain(captain.email)}
+            onClick={() => onSelectCaptain && onSelectCaptain(captain._id)}
             className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all"
           >
             <div className="flex items-center justify-between mb-3">

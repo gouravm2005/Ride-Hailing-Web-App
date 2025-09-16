@@ -26,7 +26,7 @@ captainController.loginCaptain
 
 router.get('/getAvailableCaptain',captainController.getAvailableCaptain)
 
-router.get('/getCaptainDetail/:email', captainController.getCaptainDetail)
+router.get('/getCaptainDetail/:capId', captainController.getCaptainDetail)
 
 router.get('/profile', Authmiddleware.AuthCaptain, captainController.getCaptainProfile)
 

@@ -18,6 +18,7 @@ const rideSchema = new mongoose.Schema({
     enum: ["requested", "confirmed", "ongoing", "completed", "cancelled"],
     default: "requested",
   },
+  ridetype : {type: String, required: true},
   fare: { type: Number, default: 0 },
   distance: { type: Number, default: 0 }, // km
   duration: { type: Number, default: 0 }, // minutes

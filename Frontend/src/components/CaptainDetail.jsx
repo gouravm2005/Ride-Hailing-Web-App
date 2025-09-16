@@ -2,33 +2,44 @@ import { Star, User, Phone, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const CaptainDetail = ({ email, onConfirm, onCancel }) => {
+const CaptainDetail = ({ capId, onConfirm, onCancel }) => {
   const [selectedPayment, setSelectedPayment] = useState('cash');
   const [captain, setCaptain] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasFetched = useRef(false);
 
-  useEffect(() => {
-    if (!email || hasFetched.current) return;
+useEffect(() => {
+  if (!capId || hasFetched.current) return;
 
-    const getCaptain = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/api/captain/getCaptainDetail/${email}`
-        );
-        setCaptain(res.data);
-        hasFetched.current = true;
-      } catch (err) {
-        console.error("Error fetching captain detail:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const getCaptain = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/api/captain/getCaptainDetail/${capId}`
+      );
 
-    if (email) {
-      getCaptain();
+      // Check API response shape
+      const captainData = data.captain ? data.captain : data;
+
+      setCaptain(captainData);
+      console.log("API returned:", captainData);
+
+      hasFetched.current = true;
+    } catch (err) {
+      console.error("Error fetching captain detail:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [email]);
+  };
+
+  getCaptain();
+}, [capId]);
+
+// Watch captain updates
+useEffect(() => {
+  if (captain) {
+    console.log("Captain state updated:", captain);
+  }
+}, [captain]);
 
   const paymentMethods = [
     { id: 'cash', name: 'Cash', icon: '💵' },
@@ -111,7 +122,7 @@ const CaptainDetail = ({ email, onConfirm, onCancel }) => {
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             <div className="flex-1">
               <p className="text-sm text-gray-500">Pickup Location</p>
-              <p className="font-medium">Current Location</p>
+              <p className="font-medium">{captain?.pickup || "pickup"}</p>
             </div>
           </div>
           <div className="w-px h-6 bg-gray-300 ml-1.5"></div>
@@ -119,7 +130,7 @@ const CaptainDetail = ({ email, onConfirm, onCancel }) => {
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="flex-1">
               <p className="text-sm text-gray-500">Drop Location</p>
-              <p className="font-medium">Destination</p>
+              <p className="font-medium">{captain?.destination || "destination"}</p>
             </div>
           </div>
         </div>

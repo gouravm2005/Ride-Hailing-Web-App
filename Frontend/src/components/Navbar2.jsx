@@ -26,10 +26,10 @@ function Navbar2() {
           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
             <Car className="w-5 h-5 text-white" />
           </div>
-          <h1 className='text-blue-600'>RideGo</h1>
+          <h1 className='text-blue-600'>EzRyde</h1>
         </div>
         <div className='hidden md:flex gap-10 pl-14 pt-1 font-medium'>
-          <h3><Link to='/UserHome'>Ride</Link></h3>
+          <h3><Link to='/UserRides'>Ride</Link></h3>
           <h3><Link to='/UserNotification'>Notification</Link></h3>
           <h3><Link to='/About'>About</Link></h3>
           <h3><Link to='/Support'>Support</Link></h3>
@@ -86,7 +86,7 @@ function Navbar2() {
         </div>
         {menuOpen && (
           <div onClick={handleMenu} className="md:hidden flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[40%] h-screen fixed z-10 top-16 right-0 pt-8 pl-8">
-            <h3><Link to='/UserHome'>Ride</Link></h3>
+            <h3><Link to='/UserRides'>Ride</Link></h3>
             <h3><Link to='/UserNotification'>Notification</Link></h3>
             <h3><Link to='/About'>About</Link></h3>
             <h3><Link to='/Support'>Support</Link></h3>

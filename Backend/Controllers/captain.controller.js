@@ -83,7 +83,7 @@ module.exports.getAvailableCaptain = async (req, res, next) => {
 
 module.exports.getCaptainDetail = async (req, res, next) => {
    try {
-    const captain = await captainModel.findOne({ email: req.params.email });
+    const captain = await captainModel.findOne({ _id: req.params.capId });
     if (!captain) return res.status(404).json({ message: 'Captain not found' });
     res.status(200).json(captain);
   } catch (err) {
@@ -93,7 +93,7 @@ module.exports.getCaptainDetail = async (req, res, next) => {
 
 module.exports.getCaptainProfile = async (req, res, next) => {
     try {
-    const captain = await userModel.findById(req.captain._id).select("-password");
+    const captain = await captainModel.findById(req.captain._id).select("-password");
      console.log(captain);
     res.json({
       firstname: captain.fullname.firstname,

@@ -292,3 +292,32 @@ module.exports.getCaptainRide = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+module.exports.getRideETA = async (req, res) => {
+ const {pickuplnglat, destinationlnglat} = req.body;
+   try {
+    if (
+      !pickuplnglat?.lat || !pickuplnglat?.lng ||
+      !destinationlnglat?.lat || !destinationlnglat?.lng
+    ) {
+      console.error("Invalid coordinates:", pickuplnglat, destinationlnglat);
+      return { distance: 0, duration: 0 };
+    }
+
+    const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false&geometries=geojson`;
+    const res = await axios.get(url);
+
+    if (res.data.routes && res.data.routes.length > 0) {
+      const route = res.data.routes[0];
+      return {
+        distance: parseFloat((route.distance / 1000).toFixed(2)), // km
+        duration: parseInt((route.duration / 60).toFixed(0)),    // minutes
+      };
+    }
+    return { distance: 0, duration: 0 };
+  } catch (err) {
+    console.error("OSRM error:", err.message);
+    return { distance: 0, duration: 0 };
+  }
+}
+

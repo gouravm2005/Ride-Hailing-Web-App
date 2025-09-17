@@ -14,6 +14,7 @@ const CaptainSignup = () => {
   const [vehiclePlate, setvehiclePlate] = useState('')
   const [vehicleCapacity, setvehicleCapacity] = useState('')
   const [vehicleType, setvehicleType] = useState('')
+  const [vehicleName, setvehicleName] = useState('')
   const [CaptainData, setCaptainData] = useState('')
 
   const { captain, setCaptain } = useContext(CaptainDataContext);
@@ -29,6 +30,7 @@ const CaptainSignup = () => {
       email: email,
       password: password,
       vehicle: {
+        name: vehicleName,
         color: vehicleColor,
         plate: vehiclePlate,
         capacity: vehicleCapacity,
@@ -57,6 +59,7 @@ const CaptainSignup = () => {
     setvehiclePlate('')
     setvehicleCapacity('')
     setvehicleType('')
+    setvehicleName('')
   }
 
   return (
@@ -79,6 +82,7 @@ const CaptainSignup = () => {
         <input className='w-60 bg-gray-200 p-2 rounded-sm' required value={password} onChange={(e) => setpassword(e.target.value)} type="password" placeholder='password' />
 
         <h3 className='w-60 text-xl font-medium mt-4'>Vehicle Information</h3>
+        <div className='ml-5'><input className='w-60 bg-gray-200 p-2 mr-4 rounded-sm' required value={vehicleName} onChange={(e) => setvehicleName(e.target.value)} type="text" placeholder='Name' /></div>
         <div><input className='w-28 bg-gray-200 p-2 mr-4 rounded-sm' required value={vehicleColor} onChange={(e) => setvehicleColor(e.target.value)} type="text" placeholder='Color' /> <input className='w-28 bg-gray-200 p-2 rounded-sm' required value={vehiclePlate} onChange={(e) => setvehiclePlate(e.target.value)} type="text" placeholder='Plate Number' /></div>
         <div><input className='w-28 bg-gray-200 p-2 mr-4 rounded-sm' required value={vehicleCapacity} onChange={(e) => setvehicleCapacity(e.target.value)} type="Number" placeholder='Capacity' />
           <select className="w-28 font-normal text-gray-400 bg-gray-200 p-2 rounded-sm" required value={vehicleType} onChange={(e) => setvehicleType(e.target.value)}>

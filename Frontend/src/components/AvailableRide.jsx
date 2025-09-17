@@ -46,16 +46,16 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-bold text-lg text-gray-900">₹{captain.rideFeePerKm}</p>
-                <p className="text-sm text-gray-500">{captain.time} away</p>
+                <p className="font-bold text-lg text-gray-900">₹{captain.rideFeePerKm}<span className='text-sm text-gray-500 font-normal'> per km</span></p>
+                <p className="text-sm text-gray-500 mt-1">{Math.floor(Math.random() * 10) + 1} min away</p>
               </div>
             </div>
 
             <div className="flex items-center justify-between text-sm text-gray-600">
-              <span>{captain.vehicle.name}</span>
+              <span className='ml-4'>{captain.vehicle.name}</span>
               <div className="flex items-center space-x-1">
                 <MapPin className="w-4 h-4" />
-                <span>{captain.distance}</span>
+                <span>{Math.round(Math.random() * 10) / 10} km away</span>
               </div>
             </div>
           </div>

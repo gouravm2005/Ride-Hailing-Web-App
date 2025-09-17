@@ -11,5 +11,6 @@ router.get("/getAllUserRides", Authmiddleware.AuthUser, rideController.getAllUse
 router.get("/getUserRide/:id", rideController.getUserRide);
 router.get("/getAllCaptainRides", Authmiddleware.AuthCaptain, rideController.getAllCaptainRides);
 router.get("/getCaptainRide/:id", rideController.getCaptainRide);
+router.get("/getRideETA", rideController.getRideETA);
 
 module.exports = router;

@@ -7,7 +7,7 @@ function RideCard({ ride, type }) {
   const [showing, setShowing] = useState(false);
 
   const handleClick = () => {
-    if (ride.status === "ongoing") {
+    if (ride.status === "requested") {
       navigate("/rideTracking", { state: { rideId: ride._id } });
     } else {
       setShowing(true);

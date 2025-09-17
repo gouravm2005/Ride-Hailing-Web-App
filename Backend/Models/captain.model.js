@@ -40,7 +40,6 @@ const captainschema = new mongoose.Schema({
       type: String,
       required: true,
       minlength: [2, 'the name must be at least 2 charaters long '],
-      default: 'xuv'
     },
     color: {
       type: String,

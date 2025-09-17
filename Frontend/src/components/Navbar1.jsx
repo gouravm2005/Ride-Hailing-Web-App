@@ -82,7 +82,7 @@ const Navbar1 = () => {
         </div>
 
         {menuOpen && (
-          <div className="flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[50%] md:w-[20%] h-screen absolute z-10 top-16 right-0 pt-8 pl-8 shadow-lg">
+          <div className="flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[50%] md:w-[20%] h-screen absolute z-50 top-16 right-0 pt-8 pl-8 shadow-lg">
             <h3>
               <Link to="/CaptainRides">Ride</Link>
             </h3>

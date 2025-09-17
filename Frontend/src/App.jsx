@@ -28,8 +28,8 @@ function App() {
         <Route path='/Captainlogin' element={<Captainlogin/>}/>
         <Route path='/UserSignup' element={<UserSignup/>}/>
         <Route path='/Userlogin' element={<Userlogin/>}/>
-      <Route path='/UserHome' element={<PrivateRoute> <UserHome/></PrivateRoute>}/>
-      <Route path='/CaptainHome' element={<PrivateRoute> <CaptainHome/></PrivateRoute>}/>
+      <Route path='/UserHome' element={<PrivateRoute><UserHome/></PrivateRoute>}/>
+      <Route path='/CaptainHome' element={<PrivateRoute><CaptainHome/></PrivateRoute>}/>
         <Route path='/RideTracking' element={<RideTracking/>}/>
         <Route path='/UserRides' element={<UserRides/>}/>
         <Route path='/CaptainRides' element={<CaptainRides/>}/>

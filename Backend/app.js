@@ -6,6 +6,7 @@ const connectToDB = require('./Database/db')
 const userRoutes = require('./Routes/user.route');
 const captainRoutes = require('./Routes/captain.route');
 const rideRoutes = require('./Routes/ride.route');
+const mapRoutes = require('./Routes/map.route');
 const cookiesParser = require('cookie-parser');
 const app = express()
 
@@ -29,6 +30,8 @@ app.use('/api/user', userRoutes);
 app.use('/api/ride', rideRoutes);
 
 app.use('/api/captain', captainRoutes)
+
+app.use('/api/map', mapRoutes);
 
 app.get('/',(req,res)=>{
  res.send("Hello");

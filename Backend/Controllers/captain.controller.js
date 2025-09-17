@@ -28,10 +28,11 @@ module.exports.registerCaptain = async (req, res, next) => {
       lastname: fullname.lastname,
       email,
       password: hashedPassword,
+      name: vehicle.name,
       color: vehicle.color,
       plate: vehicle.plate,
       capacity: vehicle.capacity,
-      vehicleType: vehicle.vehicleType
+      vehicleType: vehicle.vehicleType,
    });
 
    const token = captain.generateAuthToken();
@@ -112,4 +113,32 @@ module.exports.logoutCaptain = async (req, res, next) => {
    await blacklistTokenModel.create({ token });
 
    res.status(200).json({ message: 'Logged out' });
+}
+
+module.exports.getCaptainETA = async (req, res, next) => {
+ const {pickuplnglat, destinationlnglat} = req.body;
+   try {
+     if (
+       !pickuplnglat?.lat || !pickuplnglat?.lng ||
+       !destinationlnglat?.lat || !destinationlnglat?.lng
+     ) {
+       console.error("Invalid coordinates:", pickuplnglat, destinationlnglat);
+       return { distance: 0, duration: 0 };
+     }
+ 
+     const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false&geometries=geojson`;
+     const res = await axios.get(url);
+ 
+     if (res.data.routes && res.data.routes.length > 0) {
+       const route = res.data.routes[0];
+       return {
+         distance: parseFloat((route.distance / 1000).toFixed(2)), // km
+         duration: parseInt((route.duration / 60).toFixed(0)),    // minutes
+       };
+     }
+     return { distance: 0, duration: 0 };
+   } catch (err) {
+     console.error("OSRM error:", err.message);
+     return { distance: 0, duration: 0 };
+   }
 }

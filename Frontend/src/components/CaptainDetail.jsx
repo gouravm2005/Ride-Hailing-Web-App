@@ -1,5 +1,6 @@
 import { Star, User, Phone, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CaptainDetail = ({ capId, onConfirm, onCancel }) => {
@@ -7,6 +8,8 @@ const CaptainDetail = ({ capId, onConfirm, onCancel }) => {
   const [captain, setCaptain] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasFetched = useRef(false);
+
+  const navigate = useNavigate();
 
 useEffect(() => {
   if (!capId || hasFetched.current) return;

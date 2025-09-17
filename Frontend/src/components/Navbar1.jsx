@@ -27,7 +27,7 @@ const Navbar1 = () => {
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
           <Car className="w-5 h-5 text-white" />
         </div>
-        <h1 className="text-blue-600">RideGo</h1>
+        <h1 className="text-blue-600">EzRyde</h1>
       </div>
 
       <div className="flex gap-5 pt-4 p-3 pr-8 items-center">

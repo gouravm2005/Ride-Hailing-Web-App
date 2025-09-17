@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, MapPin, Shield, Clock, Star, Users, ArrowRight, Menu, X, Play, CheckCircle } from 'lucide-react';
+import { Car, MapPin, Shield, Clock, Bell, CreditCard, Users, ArrowRight, Menu, X, Play, CheckCircle, Route } from 'lucide-react';
 
 const Home = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,54 +15,65 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Updated Features
   const features = [
     {
-      icon: <MapPin className="w-8 h-8" />,
-      title: "Smart Location",
-      description: "AI-powered location tracking ensures accurate pickups and drop-offs every time."
-    },
-    {
-      icon: <Shield className="w-8 h-8" />,
-      title: "Safe & Secure",
-      description: "Background-checked drivers, real-time tracking, and 24/7 support for your safety."
-    },
-    {
       icon: <Clock className="w-8 h-8" />,
-      title: "Quick Booking",
-      description: "Book your ride in under 30 seconds with our streamlined booking process."
+      title: "Quick Ride Booking",
+      description: "Book a ride instantly with accurate pickup and destination points."
     },
     {
-      icon: <Star className="w-8 h-8" />,
-      title: "5-Star Service",
-      description: "Consistently rated service with professional drivers and clean vehicles."
+      icon: <Users className="w-8 h-8" />,
+      title: "Driver Matching",
+      description: "Get matched with nearby verified drivers in seconds."
+    },
+    {
+      icon: <Route className="w-8 h-8" />,
+      title: "Live Ride Tracking",
+      description: "Track your ride in real-time with ETA updates."
+    },
+    {
+      icon: <Bell className="w-8 h-8" />,
+      title: "Real-time Notifications",
+      description: "Stay updated on every action with instant notifications."
+    },
+    {
+      icon: <CreditCard className="w-8 h-8" />,
+      title: "Seamless Payments",
+      description: "Pay easily and securely through multiple payment options."
     }
   ];
 
-  const handlenavigate = () => {
-    navigate('/userlogin');
-  }
+  const handlenavigateUser = () => {
+    navigate('/userSignup');
+  };
+
+  const handlenavigateCaptain = () => {
+    navigate('/captainSignup');
+  };
+
   const stats = [
-    { number: "1M+", label: "Happy Riders" },
-    { number: "50K+", label: "Active Drivers" },
-    { number: "100+", label: "Cities" },
-    { number: "4.9", label: "App Rating" }
+    { number: "860K", label: "Rides / month" },
+    { number: "45K", label: "Active drivers" },
+    { number: "120", label: "Cities served" },
+    { number: "4.9", label: "Avg. rating" }
   ];
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Business Executive",
+      name: "Sara K.",
+      role: "Frequent Rider",
       rating: 5,
-      comment: "RideGo has transformed my daily commute. Always reliable, professional drivers, and competitive prices!"
+      comment: "EzRyde has transformed my daily commute. Always reliable, professional drivers, and competitive prices!"
     },
     {
-      name: "Michael Chen",
+      name: "Anuj R.",
       role: "Student",
       rating: 5,
       comment: "As a student, I love the affordable rates and the safety features. Never had a bad experience!"
     },
     {
-      name: "David Rodriguez",
+      name: "Ramesh P.",
       role: "Driver Partner",
       rating: 5,
       comment: "Great platform for drivers! Flexible hours, good earnings, and excellent support team."
@@ -73,9 +83,8 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-      }`}>
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -84,28 +93,28 @@ const Home = () => {
                 <Car className="w-6 h-6 text-white" />
               </div>
               <span className={`text-2xl font-bold ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
-                RideGo
+                EzRyde
               </span>
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className={`font-medium hover:text-blue-600 transition-colors ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}>
+              <a href="#features" className={`font-medium hover:text-blue-600 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'
+                }`}>
                 Features
               </a>
-              <a href="#how-it-works" className={`font-medium hover:text-blue-600 transition-colors ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}>
+              <a href="#how-it-works" className={`font-medium hover:text-blue-600 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'
+                }`}>
                 How it Works
               </a>
-              <a href="#testimonials" className={`font-medium hover:text-blue-600 transition-colors ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}>
+              <a href="#testimonials" className={`font-medium hover:text-blue-600 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'
+                }`}>
                 Reviews
               </a>
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium">
+              <button
+                onClick={handlenavigateUser}
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium"
+              >
                 Get Started
               </button>
             </div>
@@ -133,7 +142,10 @@ const Home = () => {
               <a href="#testimonials" className="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium">
                 Reviews
               </a>
-              <button className="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium">
+              <button
+                onClick={handlenavigateUser}
+                className="w-full mt-2 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium"
+              >
                 Get Started
               </button>
             </div>
@@ -146,27 +158,25 @@ const Home = () => {
         {/* Background with gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800"></div>
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3')] bg-cover bg-center opacity-20"></div>
-        
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full animate-pulse"></div>
-          <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full animate-pulse delay-1000"></div>
-        </div>
 
+        {/* Hero Content */}
         <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in">
-            <span className="block">RideGo</span>
-            <span className="block text-2xl sm:text-3xl lg:text-4xl font-medium mt-2 text-blue-200">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+            <span className="block">EzRyde</span>
+            <span className="block text-2xl sm:text-3xl lg:text-4xl font-medium mt-3 text-blue-200">
               Every Ride, A Step Ahead
             </span>
           </h1>
-          
+
           <p className="text-xl sm:text-2xl mb-8 text-blue-100 max-w-2xl mx-auto leading-relaxed">
             Experience the future of transportation with safe, reliable, and affordable rides at your fingertips.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <button onClick={handlenavigate} className="group bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <button
+              onClick={handlenavigateUser}
+              className="group bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+            >
               Book Your Ride
               <ArrowRight className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -186,13 +196,6 @@ const Home = () => {
             ))}
           </div>
         </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
       </section>
 
       {/* Features Section */}
@@ -200,14 +203,14 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose RideGo?
+              Features
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're revolutionizing urban transportation with cutting-edge technology and unmatched service quality.
+              EzRyde brings real-world ride-hailing experience.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
@@ -229,18 +232,18 @@ const Home = () => {
               How It Works
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Getting your ride is as easy as 1-2-3. Simple, fast, and reliable.
+              From booking to payment — the flow is smooth and user-friendly.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">
                 1
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Request</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Book Ride</h3>
               <p className="text-gray-600 leading-relaxed">
-                Enter your destination and request a ride with just a few taps on your phone.
+                Enter pickup & destination, then request a ride instantly.
               </p>
             </div>
 
@@ -248,9 +251,9 @@ const Home = () => {
               <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">
                 2
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Match</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Driver Match</h3>
               <p className="text-gray-600 leading-relaxed">
-                We instantly connect you with the nearest verified driver for the quickest pickup.
+                Nearest verified driver accepts your ride request.
               </p>
             </div>
 
@@ -258,15 +261,25 @@ const Home = () => {
               <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">
                 3
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ride</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ride Tracking</h3>
               <p className="text-gray-600 leading-relaxed">
-                Enjoy a comfortable, safe ride to your destination with real-time tracking.
+                Track your ride live with ETA updates.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-6 mx-auto">
+                4
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">End & Pay</h3>
+              <p className="text-gray-600 leading-relaxed">
+                End ride, confirm payment, and rate your experience.
               </p>
             </div>
           </div>
 
           <div className="text-center mt-12">
-            <button onClick={handlenavigate} className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
+            <button onClick={handlenavigateUser} className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105">
               Start Riding Now
             </button>
           </div>
@@ -281,7 +294,7 @@ const Home = () => {
               What Our Users Say
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Join millions of satisfied customers who trust RideGo for their daily transportation needs.
+              Join early adopters experiencing EzRyde for their daily transportation needs..
             </p>
           </div>
 
@@ -290,7 +303,7 @@ const Home = () => {
               <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    <span key={i} className="text-yellow-400">★</span>
                   ))}
                 </div>
                 <p className="text-gray-600 mb-6 leading-relaxed italic">
@@ -314,19 +327,25 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 onClick={handlenavigate} className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Ready to Get Started?
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Ready to Try the Platform?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join millions of users who have made RideGo their preferred choice for reliable transportation.
+            Join millions of users who have made EzRyde their preferred choice for reliable transportation.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="group bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
+            <button
+              onClick={handlenavigateUser}
+              className="group bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+            >
               <Users className="inline-block mr-2 w-5 h-5" />
               Book a Ride
             </button>
-            <button className="group border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300">
+            <button
+              onClick={handlenavigateCaptain}
+              className="group border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300"
+            >
               <Car className="inline-block mr-2 w-5 h-5" />
               Become a Driver
             </button>
@@ -344,41 +363,29 @@ const Home = () => {
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                   <Car className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold">RideGo</span>
+                <span className="text-2xl font-bold">EzRyde</span>
               </div>
-              <p className="text-gray-400 mb-6 max-w-md">
-                Every Ride, A Step Ahead. Experience safe, reliable, and affordable transportation with RideGo.
+              <p className="text-gray-400 max-w-md">
+                A ride-hailing platform built with MERN stack for project showcase. Not an actual service, but a real experience simulation.
               </p>
-              <div className="flex items-center space-x-2 text-sm">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>Available 24/7 in 100+ cities</span>
-              </div>
             </div>
 
-            {/* Links */}
+            {/* Quick links */}
             <div>
-              <h3 className="font-bold mb-4">Company</h3>
+              <h4 className="font-bold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
+                <li><a href="#testimonials" className="hover:text-white transition-colors">Reviews</a></li>
               </ul>
             </div>
 
-            <div>
-              <h3 className="font-bold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Safety</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
-              </ul>
-            </div>
+            {/* Contact */}
+            <div> <h3 className="font-bold mb-4">Support</h3> <ul className="space-y-2 text-gray-400"> <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li> <li><a href="#" className="hover:text-white transition-colors">Safety</a></li> <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li> </ul> </div>
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 RideGo. All rights reserved. Built with ❤️ using MERN Stack.</p>
+            <p>© {new Date().getFullYear()} EzRyde Project. All rights reserved.</p>
           </div>
         </div>
       </footer>

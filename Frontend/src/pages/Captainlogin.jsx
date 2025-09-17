@@ -41,7 +41,7 @@ const Captainlogin = () => {
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
           <Car className="w-5 h-5 text-white" />
         </div>
-        <h2 className='text-2xl font-bold  text-blue-600'>RideGo</h2>
+        <h2 className='text-2xl font-bold  text-blue-600'>EzRyde</h2>
       </div>
       <form className='flex flex-col items-center w-screen h-screen gap-5 p-10 pt-20' onSubmit={submitHandler}>
         <h3 className='text-2xl text-left font-medium w-64'>What's your Email</h3>

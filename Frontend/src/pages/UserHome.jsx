@@ -10,6 +10,8 @@ import { useGSAP } from '@gsap/react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useContext } from "react";
+import { UserDataContext } from "../context/UserContext";
 
 const UserHome = () => {
   const [pickup, setPickup] = useState('');
@@ -25,6 +27,8 @@ const UserHome = () => {
   const [destinationlnglat, setdestinationlnglat] = useState({})
 
   const navigate = useNavigate();
+
+  const { user, setUser } = useContext(UserDataContext);
 
   const panelRef = useRef(null);
 
@@ -58,8 +62,8 @@ const UserHome = () => {
 
   const requestRide = async () => {
     try {
-      const auth = JSON.parse(localStorage.getItem("auth"));
-      if (!auth || !auth.token) return;
+      const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+      if (!userAuth || !userAuth.token) return;
 
       console.log(pickuplnglat);
       console.log(destinationlnglat);
@@ -74,9 +78,9 @@ const UserHome = () => {
           destinationlnglat,
           rideType: selectedRideType
         },
-        { headers: { Authorization: `Bearer ${auth.token}` } }
+        { headers: { Authorization: `Bearer ${userAuth.token}` } }
       );
-    const ride = res.data;
+    const ride = res.data.ride;
     console.log("The ride id is",ride._id);
     navigate("/rideTracking", { state: { rideId: ride._id } });
     } catch (err) {

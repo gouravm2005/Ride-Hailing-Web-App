@@ -7,13 +7,14 @@ const userRoutes = require('./Routes/user.route');
 const captainRoutes = require('./Routes/captain.route');
 const rideRoutes = require('./Routes/ride.route');
 const mapRoutes = require('./Routes/map.route');
+const notificationRoutes = require('./Routes/notification.routes');
 const cookiesParser = require('cookie-parser');
 const app = express()
 
 app.use(cors({
-  // origin: 'http://localhost:5173',  // your frontend origin
-  // credentials: true  
- }              // allow cookies to be sent
+  origin: "http://localhost:5173", 
+  credentials: true,
+ }             
 ))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
@@ -32,6 +33,8 @@ app.use('/api/ride', rideRoutes);
 app.use('/api/captain', captainRoutes)
 
 app.use('/api/map', mapRoutes);
+
+app.use('/api/notification', notificationRoutes);
 
 app.get('/',(req,res)=>{
  res.send("Hello");

@@ -26,12 +26,12 @@ const Userlogin = () => {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/login`, userData);
 
       if (response.status === 201) {
-        const data = response.data;
-        const { token, user, role } = response.data;
-        localStorage.setItem("auth", JSON.stringify({ token, role: 'user' }));
-        console.log('login success:', response.data);
-        setUser(data.user);
-        navigate('/UserHome');
+        const { token, user } = response.data;
+        localStorage.setItem("userAuth", JSON.stringify({ token: token, role: "user" }));
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user); 
+        window.dispatchEvent(new Event("auth-changed"));
+        navigate("/UserHome");
       }
     } catch (err) {
       console.error('login error:', err.response?.data || err.message);

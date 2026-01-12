@@ -1,12 +1,49 @@
-const http = require('http')
-const app = require('./app.js')
-const dotenv = require('dotenv')
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const app = require("./app");
+const { setupSocket } = require("./socket/socketManager");
 
-const server = http.createServer(app)
+const server = http.createServer(app); 
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
-server.listen(port, ()=>{
- console.log(`Server is running at ${port}`)
-})
+// Middlewares
+app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
+// REMOVE helmet CSP in dev (causes “default-src 'none'” issue)
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", "https://Appdomain.com"],
+      },
+    })
+  );
+}
+
+setupSocket(io);
+
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
+
+
+const port = process.env.PORT || 4000;
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});

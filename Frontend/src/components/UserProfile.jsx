@@ -2,14 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User } from 'lucide-react'
 import axios from 'axios'
+import { useContext } from "react";
+import { UserDataContext } from "../context/UserContext";
 
 function UserProfile({ onClose }) {
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
+const { user, setUser } = useContext(UserDataContext);
+
   const getProfile = () => {
-    const auth = JSON.parse(localStorage.getItem('auth'))
-    if (!auth || !auth.token) {
+    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    if (!userAuth || !userAuth.token) {
       navigate('/Userlogin')
       return
     }
@@ -17,7 +21,7 @@ function UserProfile({ onClose }) {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/user/profile`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${userAuth.token}`,
         },
       })
       .then((res) => setUser(res.data))
@@ -25,8 +29,8 @@ function UserProfile({ onClose }) {
   }
 
   const logoutUser = () => {
-    const auth = JSON.parse(localStorage.getItem('auth'))
-    if (!auth || !auth.token) {
+    const userAuth = JSON.parse(localStorage.getItem('userAuth'))
+    if (!userAuth || !userAuth.token) {
       navigate('/Userlogin')
       return
     }
@@ -34,11 +38,12 @@ function UserProfile({ onClose }) {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/user/logout`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${userAuth.token}`,
         },
       })
       .then(() => {
-        localStorage.removeItem('auth')
+        localStorage.removeItem('userAuth')
+        localStorage.removeItem('user')
         navigate('/Userlogin')
       })
       .catch((err) => console.error('Logout error:', err))

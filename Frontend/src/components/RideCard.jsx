@@ -7,7 +7,7 @@ function RideCard({ ride, type }) {
   const [showing, setShowing] = useState(false);
 
   const handleClick = () => {
-    if (ride.status === "requested") {
+    if (ride.status === "accepted" || ride.status === "ongoing") {
       navigate("/rideTracking", { state: { rideId: ride._id } });
     } else {
       setShowing(true);
@@ -58,7 +58,11 @@ function RideCard({ ride, type }) {
             {/* Back Button */}
             <ArrowLeft
               className="w-6 h-6 text-blue-600 absolute top-4 left-4 cursor-pointer"
-              onClick={() => {setShowing(true), navigate("/UserHome")}}
+              onClick={() => {setShowing(false) 
+                if(type === "user")
+                navigate("/UserHome")
+                else
+                navigate("/CaptainHome")}}
             />
 
             {/* Title */}

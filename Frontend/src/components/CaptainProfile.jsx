@@ -2,14 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User } from 'lucide-react'
 import axios from 'axios'
+import { useContext } from "react";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 function CaptainProfile({ onClose }) {
-  const [captain, setCaptain] = useState(null)
+  // const [captain, setCaptain] = useState(null)
   const navigate = useNavigate()
 
+const { captain, setCaptain } = useContext(CaptainDataContext);
+
   const getProfile = () => {
-    const auth = JSON.parse(localStorage.getItem('auth'))
-    if (!auth || !auth.token) {
+    const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
+    if (!captainAuth || !captainAuth.token) {
       navigate('/Captainlogin')
       return
     }
@@ -17,7 +21,7 @@ function CaptainProfile({ onClose }) {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/captain/profile`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${captainAuth.token}`,
         },
       })
       .then((res) => setCaptain(res.data))
@@ -25,8 +29,8 @@ function CaptainProfile({ onClose }) {
   }
 
   const logoutCaptain = () => {
-    const auth = JSON.parse(localStorage.getItem('auth'))
-    if (!auth || !auth.token) {
+    const captainAuth = JSON.parse(localStorage.getItem('captainAuth'))
+    if (!captainAuth || !captainAuth.token) {
       navigate('/Captainlogin')
       return
     }
@@ -34,11 +38,12 @@ function CaptainProfile({ onClose }) {
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/captain/logout`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${captainAuth.token}`,
         },
       })
       .then(() => {
-        localStorage.removeItem('auth')
+        localStorage.removeItem('captainAuth')
+        localStorage.removeItem('captain')
         navigate('/Captainlogin')
       })
       .catch((err) => console.error('Logout error:', err))

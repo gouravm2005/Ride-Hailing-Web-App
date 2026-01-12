@@ -1,7 +1,7 @@
-const captainModel = require('../Models/captain.model')
+const captainModel = require('../models/captain.model')
 const captainService = require('../Services/captain.service')
 const { validationResult } = require('express-validator')
-const blacklistTokenModel = require('../Models/blacklistToken.model')
+const blacklistTokenModel = require('../models/blacklistToken.model')
 
 
 module.exports.registerCaptain = async (req, res, next) => {
@@ -19,9 +19,7 @@ module.exports.registerCaptain = async (req, res, next) => {
       return res.status(400).json({ message: 'Captain already exist' });
    }
 
-
    const hashedPassword = await captainModel.hashPassword(password);
-
 
    const captain = await captainService.createCaptain({
       firstname: fullname.firstname,
@@ -65,6 +63,14 @@ module.exports.loginCaptain = async (req, res, next) => {
 
    const token = captain.generateAuthToken();
 
+   // mark captain online when they login
+   try {
+     captain.status = 'active';
+     await captain.save();
+   } catch (e) {
+     console.error('Failed to set captain status active on login', e);
+   }
+
    res.cookie('token', token)
 
    res.status(201).json({ token, captain });
@@ -72,9 +78,8 @@ module.exports.loginCaptain = async (req, res, next) => {
 
 module.exports.getAvailableCaptain = async (req, res, next) => {
   try {
-    const captains = await captainModel.find({
-      status: 'inactive'
-    });
+    // Return only active captains who are currently online
+    const captains = await captainModel.find({ status: 'active' });
 
     res.status(200).json(captains);
   } catch (err) {
@@ -107,10 +112,21 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 }
 
 module.exports.logoutCaptain = async (req, res, next) => {
-   res.clearCookie('token');
-   const token = req.cookies.token || req.headers.authorization.split(' ')[1];
+   try {
+     // mark captain inactive on logout
+     if (req.captain && req.captain._id) {
+       await captainModel.findByIdAndUpdate(req.captain._id, { status: 'inactive' });
+     }
+   } catch (e) {
+     console.error('Failed to set captain inactive on logout', e);
+   }
 
-   await blacklistTokenModel.create({ token });
+   res.clearCookie('token');
+   const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
+   if (token) {
+     await blacklistTokenModel.create({ token });
+   }
 
    res.status(200).json({ message: 'Logged out' });
 }

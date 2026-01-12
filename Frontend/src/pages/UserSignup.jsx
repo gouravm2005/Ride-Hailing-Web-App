@@ -36,13 +36,13 @@ const UserSignup = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/register`, newUser);
 
-      const token = response.data.token;
-
-      const auth = localStorage.setItem("auth", JSON.stringify({ token: token, role: 'user' }));
-
       if (response.status === 201) {
-        console.log('Signup success:', response.data);
-        navigate('/UserHome');
+        const { token, user } = response.data;
+        localStorage.setItem("userAuth", JSON.stringify({ token:token, role: "user" }));
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user); 
+        window.dispatchEvent(new Event("auth-changed"));
+        navigate("/UserHome");
       }
     } catch (err) {
       console.error('Signup error:', err.response?.data || err.message);
@@ -52,7 +52,7 @@ const UserSignup = () => {
   return (
     <div>
       <div className='w-screen h-14 bg-gray-200 text-xl flex gap-2 font-medium pl-5 pt-3 pb-4'>
-         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
           <Car className="w-5 h-5 text-white" />
         </div>
         <h2 className='text-2xl font-bold  text-blue-600'>EzRyde</h2>

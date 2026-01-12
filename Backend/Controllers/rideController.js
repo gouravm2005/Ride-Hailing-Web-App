@@ -1,8 +1,11 @@
 const axios = require('axios');
 const fetch = require("node-fetch");
-const Captain = require('../Models/captain.model')
-const Ride = require('../Models/ride.model')
-const User = require('../Models/user.model')
+const Captain = require('../models/captain.model')
+const Ride = require('../models/ride.model')
+const User = require('../models/user.model')
+const { createNotification } = require("./notificationController");
+const { sendToUser, sendToRideRoom, sendNotification } = require("../socket/socketManager");
+const Notification = require('../models/notification.model');
 
 module.exports.getLocationSuggestions = async (req, res) => {
   try {
@@ -47,7 +50,7 @@ async function getCoordinates(placeName) {
 
     const res = await axios.get("https://nominatim.openstreetmap.org/search", {
       params: { q: placeName, format: "json", limit: 1 },
-      headers: { "User-Agent": "RideApp/1.0" }, // Nominatim requires this
+      headers: { "User-Agent": "RideApp/1.0" }, 
     });
 
     if (res.data && res.data.length > 0) {
@@ -63,7 +66,7 @@ async function getCoordinates(placeName) {
   }
 }
 
-// ✅ Add random offset around pickup (different per captain)
+// Add random offset around pickup (different per captain)
 function addRandomOffset(lat, lng, maxOffsetKm = 1) {
   if (!lat || !lng) return { lat: 0, lng: 0 };
 
@@ -82,14 +85,13 @@ module.exports.updateCaptainLocation = async (req, res) => {
   try {
     let { pickup, pickuplnglat, destination, destinationlnglat } = req.body;
 
-    // ✅ Basic validation
     if (!pickup || !destination) {
       return res
         .status(400)
         .json({ message: "Pickup and destination are required" });
     }
 
-    // ✅ Normalize input (handle empty, null, string, 0)
+    // Normalize input (handle empty, null, string, 0)
     const isInvalid = (coord) =>
       !coord || coord === "" || coord === 0 || isNaN(Number(coord));
 
@@ -119,13 +121,13 @@ module.exports.updateCaptainLocation = async (req, res) => {
       };
     }
 
-    // ✅ Get all captains
+    // Get all captains
     const captains = await Captain.find();
     if (!captains.length) {
       return res.status(404).json({ message: "No captains found" });
     }
 
-    // ✅ Update captains with unique nearby locations
+    // Update captains with unique nearby locations
     const updates = captains.map((captain) => {
       const randomCoords = addRandomOffset(
         pickuplnglat.lat,
@@ -235,13 +237,173 @@ module.exports.requestRide = async (req, res) => {
 
     await ride.save();
 
+    // create notification for captain
+    const notif = await Notification.create({
+      ride: ride._id,
+      sender: req.user._id,
+      senderModel: "User",
+      receiver: captainId,
+      receiverModel: "Captain",
+      type: "requested",
+      title: "New Ride Request",
+      message: `A user requested a ride from ${pickup} to ${destination}`,
+    });
+
+    // try real-time send. event = 'rideRequest' or 'receiveNotification'
+    const sent = sendToUser(captainId, "receiveNotification", notif);
+    // optionally log if not sent (captain offline)
+    if (!sent) console.log("Captain offline, notification saved for later.");
+
     return res.status(201).json({
-      message: "Ride requested successfully",
+      notif,
       ride,
     });
   } catch (error) {
     console.error("Error creating ride:", error);
     return res.status(500).json({ message: "Error creating ride", error: error.message });
+  }
+};
+
+module.exports.acceptRide = async (req, res) => {
+  try {
+    const rideId = req.params.id;
+    const captainId = req.captain?._id;
+    if (!captainId) {
+    return res.status(401).json({ message: "Captain authentication failed" });
+    }
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: "Ride not found" });
+    ride.status = "accepted";
+    ride.captain = captainId;
+    await ride.save();
+    const notifUser = await Notification.create({
+      ride: ride._id,
+      sender: captainId,
+      senderModel: "Captain",
+      receiver: ride.user,
+      receiverModel: "User",
+      type: "accepted",
+      title: "Ride Accepted",
+      message: "Your ride has been accepted",
+    });
+    sendNotification(ride.user.toString(), notifUser);
+    sendToRideRoom(ride._id, "rideStatusUpdate", {
+      rideId: ride._id,
+      status: "accepted",
+    });
+    res.json({ success: true, ride });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Captain rejects
+module.exports.rejectRide = async (req, res) => {
+  try {
+    const rideId = req.params.id;
+    const captainId = req.captain?._id;
+
+     if (!captainId) {
+    return res.status(401).json({ message: "Captain authentication failed" });
+    }
+
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: "Ride not found" });
+
+    ride.status = "cancelled";
+    await ride.save();
+
+    const notifUser = await Notification.create({
+      ride: ride._id,
+      sender: captainId,
+      senderModel: "Captain",
+      receiver: ride.user,
+      receiverModel: "User",
+      type: "cancelled",
+      title: "Ride Rejected",
+      message: "Captain rejected the ride",
+    });
+
+    sendNotification(ride.user.toString(), notifUser);
+    sendToRideRoom(ride._id, "rideStatusUpdate", {
+      rideId: ride._id,
+      status: "cancelled",
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Complete ride
+module.exports.completeRide = async (req, res) => {
+  try {
+    const rideId = req.params.id || req.body.rideId;
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: 'Ride not found' });
+    ride.status = "completed";
+    await ride.save();
+
+    const notifUser = await Notification.create({
+      ride: ride._id,
+      sender: ride.captain,
+      senderModel: "Captain",
+      receiver: ride.user,
+      receiverModel: "User",
+      type: "completed",
+      title: "Ride Completed",
+      message: "Ride completed successfully",
+    });
+
+    sendToUser(ride.user.toString(), "receiveNotification", notifUser);
+    sendToRideRoom(ride._id, "rideStatusUpdate", { rideId: ride._id, status: "completed" });
+
+    res.json({ success: true, ride });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// User cancels ride
+module.exports.cancelRideByUser = async (req, res) => {
+  try {
+    const rideId = req.params.id || req.body.rideId;
+    const userId = req.user ? req.user._id : req.body.userId;
+
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: 'Ride not found' });
+
+    // only allow the passenger to cancel
+    if (String(ride.user) !== String(userId)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    ride.status = 'cancelled';
+    await ride.save();
+
+    // notify captain if assigned
+    if (ride.captain) {
+      const notif = await Notification.create({
+        ride: ride._id,
+        sender: userId,
+        senderModel: 'User',
+        receiver: ride.captain,
+        receiverModel: 'Captain',
+        type: 'cancelled',
+        title: 'Ride Cancelled',
+        message: 'Passenger cancelled the ride',
+      });
+
+      sendToUser(String(ride.captain), 'receiveNotification', notif);
+      sendToRideRoom(ride._id, 'rideStatusUpdate', { rideId: ride._id, status: 'cancelled' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error cancelling ride by user:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -262,8 +424,8 @@ module.exports.getAllUserRides = async (req, res) => {
 module.exports.getUserRide = async (req, res) => {
   try {
     const ride = await Ride.findById(req.params.id)
-    .populate("captain", "fullname email")
-    .populate("user", "fullname, email" )
+  .populate("captain", "fullname email")
+  .populate("user", "fullname email" )
     if (!ride) return res.status(404).json({ message: "Ride not found" });
     res.json(ride);
   } catch (err) {

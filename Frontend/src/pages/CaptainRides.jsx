@@ -4,15 +4,18 @@ import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import RideCard from "../components/RideCard";
 import Navbar1 from "../components/Navbar1";
+import { useContext } from "react";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 function CaptainRides() {
   const [rides, setRides] = useState([]);
   const navigate = useNavigate();
+  const { captain, setCaptain } = useContext(CaptainDataContext);
 
   useEffect(() => {
     const fetchRides = async () => {
+      const auth = JSON.parse(localStorage.getItem("captainAuth"));
       try {
-        const auth = JSON.parse(localStorage.getItem("auth"));
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/ride/getAllCaptainRides`,
           { headers: { Authorization: `Bearer ${auth.token}` } }

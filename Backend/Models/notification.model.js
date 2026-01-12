@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
-  ride: { type: mongoose.Schema.Types.ObjectId, ref: "Ride" }, // Link to ride
+  ride: { type: mongoose.Schema.Types.ObjectId, ref: "Ride" }, 
   sender: { type: mongoose.Schema.Types.ObjectId, refPath: "senderModel" }, 
-  senderModel: { type: String, enum: ["User", "Captain"] }, // who triggered notification
+  senderModel: { type: String, enum: ["User", "Captain"] }, 
   receiver: { type: mongoose.Schema.Types.ObjectId, refPath: "receiverModel" },
-  receiverModel: { type: String, enum: ["User", "Captain"] }, // who receives it
+  receiverModel: { type: String, enum: ["User", "Captain"] }, 
 
   type: {
     type: String,
     enum: [
       "requested",  // User requested ride
-      "confirmed",  // User confirmed captain
       "accepted",   // Captain accepted ride
+      "rejected",   // Captain rejected ride 
       "started",    // Ride started
       "completed",  // Ride completed
       "cancelled"   // Ride cancelled
@@ -20,12 +20,12 @@ const notificationSchema = new mongoose.Schema({
     required: true
   },
 
-  title: { type: String },      // e.g. "Ride Accepted"
-  message: { type: String },    // e.g. "Captain John has accepted your ride"
+  title: { type: String },    
+  message: { type: String },    
   
   isRead: { type: Boolean, default: false }, // mark notification as read/unread
 
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Notification", notificationSchema);
+module.exports = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);

@@ -3,16 +3,20 @@ import { Car } from "lucide-react";
 import { Link } from 'react-router-dom'
 import UserProfile from "./UserProfile";
 import CaptainProfile from "./CaptainProfile";
+import { useContext } from "react";
+import { UserDataContext } from "../context/UserContext";
 
 function Navbar2() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [role, setRole] = useState("user");
 
+const { user, setUser } = useContext(UserDataContext);
+
   useEffect(() => {
-    const auth = JSON.parse(localStorage.getItem("auth"));
-    if (auth?.role) {
-      setRole(auth.role);
+    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    if (userAuth?.role) {
+      setRole(userAuth.role);
     }
   }, []);
 
@@ -30,7 +34,7 @@ function Navbar2() {
         </div>
         <div className='hidden md:flex gap-10 pl-14 pt-1 font-medium'>
           <h3><Link to='/UserRides'>Ride</Link></h3>
-          <h3><Link to='/UserNotification'>Notification</Link></h3>
+          <h3> {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link> }</h3>
           <h3><Link to='/About'>About</Link></h3>
           <h3><Link to='/Support'>Support</Link></h3>
         </div>
@@ -87,7 +91,7 @@ function Navbar2() {
         {menuOpen && (
           <div onClick={handleMenu} className="md:hidden flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[40%] h-screen fixed z-10 top-16 right-0 pt-8 pl-8">
             <h3><Link to='/UserRides'>Ride</Link></h3>
-            <h3><Link to='/UserNotification'>Notification</Link></h3>
+            <h3> {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link> }</h3>
             <h3><Link to='/About'>About</Link></h3>
             <h3><Link to='/Support'>Support</Link></h3>
             <button className="w-20 h-10 border-2 rounded-md hover:border-blue-200 text-red-500 text-lg">Logout</button>

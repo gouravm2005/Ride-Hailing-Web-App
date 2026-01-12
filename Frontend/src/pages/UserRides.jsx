@@ -4,15 +4,18 @@ import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import RideCard from "../components/RideCard";
 import Navbar2 from "../components/Navbar2";
+import { useContext } from "react";
+import { UserDataContext } from "../context/UserContext";
 
 function UserRides() {
   const [rides, setRides] = useState([]);
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserDataContext);
 
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const auth = JSON.parse(localStorage.getItem("auth"));
+        const auth = JSON.parse(localStorage.getItem("userAuth"));
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/ride/getAllUserRides`,
           { headers: { Authorization: `Bearer ${auth.token}` } }

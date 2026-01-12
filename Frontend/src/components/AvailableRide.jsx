@@ -2,14 +2,16 @@ import { MapPin, Star, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import { useContext } from "react";
+import { UserDataContext } from "../context/UserContext";
 
 const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
   const [mockCaptains, setmockCaptains] = useState([]);
+const { user, setUser } = useContext(UserDataContext);
 
   useEffect(() => {
-    const auth = JSON.parse(localStorage.getItem("auth"));
-
-    if (!auth || !auth.token)
+    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    if (!userAuth || !userAuth.token)
       return;
 
     axios.get(`${import.meta.env.VITE_BASE_URL}/api/captain/getAvailableCaptain`)
@@ -27,7 +29,7 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
       <div className="space-y-4">
         {mockCaptains.map((captain) => (
           <div
-            key={captain.id}
+            key={captain._id}
             onClick={() => onSelectCaptain && onSelectCaptain(captain._id)}
             className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all"
           >
@@ -37,7 +39,7 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
                   <User className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">{captain.fullname.firstname}{captain.fullname.lastname}</h4>
+                  <h4 className="font-semibold text-gray-900">{captain.fullname.firstname} {captain.fullname.lastname}</h4>
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <span className="text-sm text-gray-600">{captain.rideStats.rating}</span>

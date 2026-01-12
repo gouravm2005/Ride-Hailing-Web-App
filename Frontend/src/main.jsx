@@ -6,6 +6,8 @@ import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import AuthProvider from "./components/AuthContext";
+import SocketProvider from "./components/SocketProvider";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -25,9 +27,11 @@ createRoot(document.getElementById('root')).render(
     <CaptainContext>
       <UserContext>
         <BrowserRouter>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </BrowserRouter>
       </UserContext>
     </CaptainContext>
-  </StrictMode>,
+  </StrictMode>
 )

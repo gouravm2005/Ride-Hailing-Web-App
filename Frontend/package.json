@@ -12,14 +12,18 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-google-maps/api": "^2.20.7",
-    "axios": "^1.9.0",
+    "axios": "^1.12.2",
     "components": "^0.1.0",
     "gsap": "^3.12.7",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.541.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.1",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.4.1",
+    "react-toastify": "^11.0.5",
+    "socket.io-client": "^4.8.1",
     "tailwind": "^3.1.0"
   },
   "devDependencies": {

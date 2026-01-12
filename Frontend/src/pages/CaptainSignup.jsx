@@ -40,12 +40,13 @@ const CaptainSignup = () => {
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/captain/register`, CaptainData);
-
       if (response.status === 201) {
-        console.log('Signup success:', response.data);
-        const token = response.data.token;
-        localStorage.setItem("auth", JSON.stringify({ token: token, role: 'captain' }));
-        navigate('/CaptainHome');
+        const { token, captain } = response.data;
+        localStorage.setItem("captainAuth", JSON.stringify({ token, role: "captain" }));
+        localStorage.setItem("captain", JSON.stringify(captain));
+        setCaptain(captain); // ✅ from CaptainContext
+        window.dispatchEvent(new Event("auth-changed"));
+        navigate("/CaptainHome");
       }
     } catch (err) {
       console.error('Signup error:', err.response?.data || err.message);

@@ -3,17 +3,21 @@ import { Car } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import CaptainProfile from "./CaptainProfile";
+import { useContext } from "react";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 const Navbar1 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [role, setRole] = useState("user");
 
+  const { captain, setCaptain } = useContext(CaptainDataContext);
+
   useEffect(() => {
-    const auth = JSON.parse(localStorage.getItem("auth"));
-    if (auth?.role) {
-      setRole(auth.role);
-      console.log(auth.role);
+    const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
+    if (captainAuth?.role) {
+      setRole(captainAuth.role);
+      console.log(captainAuth.role);
     }
   }, []);
 
@@ -87,7 +91,7 @@ const Navbar1 = () => {
               <Link to="/CaptainRides">Ride</Link>
             </h3>
             <h3>
-              <Link to="/UserNotification">Notification</Link>
+              {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link> }
             </h3>
             <h3>
               <Link to="/About">About</Link>

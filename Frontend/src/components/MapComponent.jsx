@@ -1,87 +1,130 @@
-import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
-import { useMap } from "react-leaflet";
-import { useState, useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  useMap,
+} from "react-leaflet";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { carIcon } from "../utils/carIcon";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
-const FitBounds = ({ bounds }) => {
+/* ---------------- Fit bounds ---------------- */
+const FitBounds = ({ points }) => {
   const map = useMap();
+
   useEffect(() => {
-    if (bounds) map.fitBounds(bounds);
-  }, [bounds, map]);
+    if (points?.length > 1) {
+      map.fitBounds(points, { padding: [60, 60] });
+    }
+  }, [points, map]);
+
   return null;
 };
 
-const MapComponent = ({ pickuplnglat, destinationlnglat }) => {
+/* ---------------- Map Component ---------------- */
+
+const MapComponent = ({ pickuplnglat, destinationlnglat, captainPos, rideStatus }) => {
   const [route, setRoute] = useState([]);
 
+  // Always fetch the real route between pickup and destination
   useEffect(() => {
-    if (pickuplnglat && destinationlnglat) {
-      axios
-        .get(`${import.meta.env.VITE_BASE_URL}/api/map/getroute`, {
-          params: {
-            pickupLat: pickuplnglat.lat,
-            pickupLng: pickuplnglat.lng,
-            destLat: destinationlnglat.lat,
-            destLng: destinationlnglat.lng,
-          },
-        })
-        .then((res) => {
-        const coords = res.data.coordinates || res.data.geometry.coordinates;
-        setRoute(coords);
-        })
-        .catch((err) => console.error("Route error:", err));
-    }
+    if (!pickuplnglat || !destinationlnglat) return;
+    axios
+      .get(`${import.meta.env.VITE_BASE_URL}/api/map/getroute`, {
+        params: {
+          pickupLat: pickuplnglat.lat,
+          pickupLng: pickuplnglat.lng,
+          destLat: destinationlnglat.lat,
+          destLng: destinationlnglat.lng,
+        },
+      })
+      .then((res) => {
+        let coords = [];
+        if (res.data?.routes?.length) {
+          coords = res.data.routes[0].geometry.coordinates;
+        } else if (res.data?.geometry?.coordinates) {
+          coords = res.data.geometry.coordinates;
+        } else if (res.data?.coordinates) {
+          coords = res.data.coordinates;
+        }
+        // Defensive: ensure all points are [lat, lng] and not swapped
+        // OSRM and many APIs return [lng, lat], so swap to [lat, lng]
+        const formatted = coords
+          .map((pt) => {
+            if (Array.isArray(pt) && pt.length === 2) {
+              // If both numbers, and in India (lat ~ 8-37, lng ~ 68-97)
+              // If first is > 50, it's likely lng, so swap
+              if (pt[0] > 50 && pt[1] >= 8 && pt[1] <= 37) {
+                // [lng, lat] -> [lat, lng]
+                return [Number(pt[1]), Number(pt[0])];
+              }
+              // If first is in lat range, keep as is
+              return [Number(pt[0]), Number(pt[1])];
+            }
+            return pt;
+          })
+          .filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng));
+        setRoute(formatted);
+      })
+      .catch((err) => console.error("Route error:", err));
   }, [pickuplnglat, destinationlnglat]);
 
-  const hasLocations = pickuplnglat && destinationlnglat;
-  const center = hasLocations
-    ? pickuplnglat
-    : { lat: 28.7041, lng: 77.1025 }; // default Delhi center
+  // Center always on pickup
+  const center = useMemo(() => {
+    if (pickuplnglat?.lat) {
+      return [pickuplnglat.lat, pickuplnglat.lng];
+    }
+    return [28.7041, 77.1025];
+  }, [pickuplnglat]);
 
-    
-  const bounds =
-    route.length > 0 ? [pickuplnglat, destinationlnglat] : null;
+  // Captain marker logic:
+  // - Before ride starts: at pickup
+  // - After ride starts: at backend-provided captainPos (from socket)
+  // The car marker should always use backend-provided captainPos after ride starts
+  let captainPosition = pickuplnglat;
+  if (rideStatus === "started" && captainPos && captainPos.lat && captainPos.lng) {
+    captainPosition = captainPos;
+  }
 
   return (
-    <div className="h-full w-full md:pb-12 flex justify-center items-center">
-      <div className="h-[90%] w-[90%] border-b rounded-md overflow-hidden shadow-md">
-        <MapContainer
-          center={center}
-          zoom={12}
-          className="h-full w-full"
-        >
-  
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
+    <div className="h-full w-full">
+      <MapContainer
+        center={center}
+        zoom={13}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap contributors"
+        />
 
-          {/* Show markers only if coords exist */}
-          {pickuplnglat && <Marker position={[pickuplnglat.lat, pickuplnglat.lng]} />}
-           {destinationlnglat && (
-            <Marker position={[destinationlnglat.lat, destinationlnglat.lng]} />
-          )}
+        {/* Pickup marker */}
+        {pickuplnglat?.lat && (
+          <Marker position={[pickuplnglat.lat, pickuplnglat.lng]} />
+        )}
 
-          {/* Show route if available */}
-          {hasLocations && route.length > 0 && (
-            <Polyline positions={route} color="blue" />
-          )}
-           {bounds && <FitBounds bounds={bounds} />}
-        </MapContainer>
-      </div>
+        {/* Destination marker */}
+        {destinationlnglat?.lat && (
+          <Marker position={[destinationlnglat.lat, destinationlnglat.lng]} />
+        )}
+
+        {/* Route polyline */}
+        {route.length > 0 && (
+          <Polyline positions={route} pathOptions={{ color: "#2563eb", weight: 5 }} />
+        )}
+
+        {/* Captain car marker (moves only as backend emits new positions) */}
+        {captainPosition?.lat && captainPosition?.lng && (
+          <Marker position={[captainPosition.lat, captainPosition.lng]} icon={carIcon} />
+        )}
+
+        {/* Fit bounds to pickup/destination for best accuracy */}
+        {pickuplnglat?.lat && destinationlnglat?.lat && (
+          <FitBounds points={[[pickuplnglat.lat, pickuplnglat.lng], [destinationlnglat.lat, destinationlnglat.lng]]} />
+        )}
+      </MapContainer>
     </div>
   );
 };

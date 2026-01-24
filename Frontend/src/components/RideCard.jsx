@@ -7,9 +7,9 @@ function RideCard({ ride, type }) {
   const [showing, setShowing] = useState(false);
 
   const handleClick = () => {
-    if (ride.status === "accepted" || ride.status === "ongoing") {
-      navigate("/rideTracking", { state: { rideId: ride._id } });
-    } else {
+    if (ride.status === "accepted" || ride.status === "started" || ride.status === "ongoing") {
+      navigate("/rideTracking", { state: { rideId: ride._id, type: type } });
+    } else if (ride.status === "requested" || ride.status === "completed" || ride.status === "cancelled") {
       setShowing(true);
     }
   };

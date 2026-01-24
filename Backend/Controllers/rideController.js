@@ -6,6 +6,7 @@ const User = require('../models/user.model')
 const { createNotification } = require("./notificationController");
 const { sendToUser, sendToRideRoom, sendNotification } = require("../socket/socketManager");
 const Notification = require('../models/notification.model');
+const { startRideSimulation } = require("../Services/rideTracking.service");
 
 module.exports.getLocationSuggestions = async (req, res) => {
   try {
@@ -276,6 +277,9 @@ module.exports.acceptRide = async (req, res) => {
     ride.status = "accepted";
     ride.captain = captainId;
     await ride.save();
+    const captain = await Captain.findById(captainId);
+    captain.rideStats.ridesAccepted = (captain.rideStats.ridesAccepted || 0) + 1;
+    await captain.save();
     const notifUser = await Notification.create({
       ride: ride._id,
       sender: captainId,
@@ -313,6 +317,10 @@ module.exports.rejectRide = async (req, res) => {
     ride.status = "cancelled";
     await ride.save();
 
+    const captain = await Captain.findById(captainId);
+    captain.rideStats.ridesRejected = (captain.rideStats.ridesRejected || 0) + 1;
+    await captain.save();
+
     const notifUser = await Notification.create({
       ride: ride._id,
       sender: captainId,
@@ -332,6 +340,47 @@ module.exports.rejectRide = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports.verifyOtp = async (req, res) => {
+  try {
+    const rideId = req.params.id;
+    const { otp } = req.body;
+
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: 'Ride not found' });
+    if (ride.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+    else {
+      ride.status = "otpVerified";
+      await ride.save();
+    }
+
+    res.json({ success: true, ride });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports.startRide = async (req, res) => {
+  try {
+    const rideId = req.params.id || req.body.rideId;
+    const captainId = req.body.captainId;
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: 'Ride not found' });
+    ride.status = "started";
+    ride.startedAt = new Date();
+    await ride.save();
+
+    const captain = await Captain.findById(captainId);
+    captain.rideStats.distanceCovered = (captain.rideStats.distanceCovered || 0) + ride.distance;
+    await captain.save();
+
+    startRideSimulation(ride._id.toString());
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

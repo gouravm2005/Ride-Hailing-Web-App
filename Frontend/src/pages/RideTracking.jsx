@@ -3,42 +3,53 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Navbar2 from "../components/Navbar2";
+import Navbar1 from "../components/Navbar1";
 import MapComponent from "../components/MapComponent";
 import { Phone, Star, Car } from "lucide-react";
+import { io } from "socket.io-client";
+
+const socket = io(import.meta.env.VITE_BASE_URL, {
+  transports: ["websocket"],
+});
 
 const RideTracking = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { rideId } = location.state || {};
+  const { rideId, type } = location.state || {};
 
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
+  const [captainId, setCaptainId] = useState("");
+  const [captainInfo, setCaptainInfo] = useState({})
   const [enteredOtp, setEnteredOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
   const [startingRide, setStartingRide] = useState(false);
+  const [captainPos, setCaptainPos] = useState(null);
 
   // Detect role
   useEffect(() => {
-    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
-    const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedCaptain = JSON.parse(localStorage.getItem("captain"));
+   if(!captainId) return;
 
-    if (storedUser?._id || userAuth?.user?._id) {
-      setRole("user");
-    } else if (storedCaptain?._id || captainAuth?.captain?._id) {
-      setRole("captain");
-    }
-  }, []);
+   axios.get(`${import.meta.env.VITE_BASE_URL}/api/captain/getCaptainDetail/${captainId}`)
+      .then((res) => {
+        setCaptainInfo(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching captain details:", err);
+      });
+  }, [captainId]);
 
   useEffect(() => {
-    if (!rideId) return;
+    if (!rideId || !type) return;
+
+    setRole(type);
 
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/ride/getUserRide/${rideId}`)
       .then((res) => {
         setRide(res.data);
+        setCaptainId(res.data.captain?._id || "");
         setLoading(false);
       })
       .catch((err) => {
@@ -46,6 +57,30 @@ const RideTracking = () => {
         setLoading(false);
       });
   }, [rideId]);
+
+
+  useEffect(() => {
+    if (!rideId || !ride) return;
+
+    // Before ride starts, captain is at pickup
+    if (ride.status !== "started") {
+      setCaptainPos(ride.pickup);
+      return;
+    }
+
+    // After ride starts, listen for backend updates
+    socket.emit("joinRide", rideId);
+
+    const handleUpdate = (data) => {
+      setCaptainPos({ lat: data.lat, lng: data.lng });
+    };
+    socket.on("captainLocationUpdate", handleUpdate);
+
+    return () => {
+      socket.off("captainLocationUpdate", handleUpdate);
+    };
+  }, [rideId, ride]);
+
 
   const handleVerifyOtp = async () => {
     if (!enteredOtp || !ride) {
@@ -97,7 +132,7 @@ const RideTracking = () => {
 
       await axios.post(
         `${import.meta.env.VITE_BASE_URL}/api/ride/startRide/${ride._id}`,
-        {},
+        {captainId: captainId},
         { headers }
       );
 
@@ -118,14 +153,20 @@ const RideTracking = () => {
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <Navbar2 />
+      {role === "user" ? <Navbar2 /> : <Navbar1 />}
 
       {/*Responsive Layout */}
       <div className="flex-1 flex flex-col md:flex-row">
         {/* Map Section */}
+
         <div className="h-1/2 md:h-full md:w-[70%] relative">
           {pickup?.lat && destination?.lat ? (
-            <MapComponent pickuplnglat={pickup} destinationlnglat={destination} />
+            <MapComponent
+              pickuplnglat={pickup}
+              destinationlnglat={destination}
+              captainPos={captainPos}
+              rideStatus={ride.status}
+            />
           ) : (
             <div className="flex items-center justify-center h-full bg-gray-100">
               <p className="text-gray-500">Loading map...</p>
@@ -145,15 +186,15 @@ const RideTracking = () => {
                 <div className="flex items-center space-x-2 mt-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
                   <h2 className="text-sm text-gray-700">
-                    {ride?.captain?.rideStats?.rating ?? "N/A"}
+                    {captainInfo?.rideStats?.rating ?? "N/A"}
                   </h2>
                   <span className="text-sm text-gray-400">
-                    ({captain?.rideStats?.totalRides || 0} trips)
+                    ({captainInfo?.rideStats?.totalRides || 0} trips)
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mt-2 flex items-center">
                   <Car className="w-4 h-4 mr-2 text-gray-500" />
-                  {captain?.vehicle?.name || "Vehicle Info Unavailable"}
+                  {captainInfo?.vehicle?.name || "Vehicle Info Unavailable"}
                 </p>
               </div>
 
@@ -172,22 +213,22 @@ const RideTracking = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Name:</span>
                   <span className="font-medium">
-                    {captain?.vehicle?.name || "Unknown"}
+                    {captainInfo?.vehicle?.name || "Unknown"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Number:</span>
                   <span className="font-medium">
-                    {captain?.vehicle?.plate || "N/A"}
+                    {captainInfo?.vehicle?.plate || "N/A"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Distance:</span>
-                  <span className="font-medium">{ride.distance}</span>
+                  <span className="font-medium">{ride.distance} km</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Arrival Time:</span>
-                  <span className="font-medium">{ride.duration}</span>
+                  <span className="font-medium">{ride.duration} min</span>
                 </div>
               </div>
             </div>
@@ -226,6 +267,8 @@ const RideTracking = () => {
 
             {/* Role-based OTP & Actions */}
             {role === "user" && (
+              <div>
+                {status !== "started" && (
               <div className="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-lg text-center">
                 <p className="font-medium text-gray-800">
                   OTP to Share with Captain:{" "}
@@ -234,6 +277,8 @@ const RideTracking = () => {
                 <p className="text-xs text-gray-600 mt-1">
                   Share this OTP with the captain to start the ride
                 </p>
+              </div>
+              )}
               </div>
             )}
 
@@ -275,7 +320,7 @@ const RideTracking = () => {
                     </button>
                   </div>
                 )}
-
+  
                 {status === "started" && (
                   <div className="p-3 bg-green-100 border border-green-300 rounded-lg text-center">
                     <p className="font-medium text-green-700">

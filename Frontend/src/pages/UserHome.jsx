@@ -82,7 +82,7 @@ const UserHome = () => {
       );
     const ride = res.data.ride;
     console.log("The ride id is",ride._id);
-    navigate("/rideTracking", { state: { rideId: ride._id } });
+    navigate("/rideTracking", { state: { rideId: ride._id, type: "user" } });
     } catch (err) {
       console.error("Error:", err);
     }

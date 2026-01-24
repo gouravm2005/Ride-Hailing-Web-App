@@ -2,6 +2,7 @@ import { createContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 
 export const NotificationContext = createContext(null);
+export const SocketContext = createContext(null);
 
 export default function SocketProvider({ children }) {
   const socketRef = useRef(null);

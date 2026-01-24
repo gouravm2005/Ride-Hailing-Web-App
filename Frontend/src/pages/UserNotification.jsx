@@ -3,7 +3,7 @@ import SocketProvider from "../components/SocketProvider";
 import NotificationsPage from "../components/NotificationsPage";
 
 const UserNotification = () => {
-  return <NotificationsPage />;
+  return <NotificationsPage role="user" />;
 };
 
 export default UserNotification;

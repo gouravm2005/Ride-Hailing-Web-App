@@ -4,9 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "./SocketProvider";
 
-function NotificationsPage() {
+function NotificationsPage({ role }) {
   const { notifications, setNotifications } = useContext(NotificationContext);
-  const [role, setRole] = useState("");
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
@@ -20,10 +19,8 @@ function NotificationsPage() {
         const storedCaptain = JSON.parse(localStorage.getItem("captain"));
 
         if (storedUser?._id || userAuth?.user?._id) {
-          setRole("user");
           setUserId(storedUser?._id || userAuth?.user?._id);
         } else if (storedCaptain?._id || captainAuth?.captain?._id) {
-          setRole("captain");
           setUserId(storedCaptain?._id || captainAuth?.captain?._id);
         } else {
           console.warn("No role detected!");
@@ -32,7 +29,7 @@ function NotificationsPage() {
         console.error("Error detecting role:", e);
       }
     };
-
+    
     detectRoleAndId();
   }, []);
 

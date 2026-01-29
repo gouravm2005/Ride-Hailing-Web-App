@@ -158,3 +158,16 @@ module.exports.getCaptainETA = async (req, res, next) => {
      return { distance: 0, duration: 0 };
    }
 }
+
+module.exports.updateCaptainStatus = async (req, res, next) => {
+  try {
+    const { captainId, status } = req.body;
+    const captain = await captainModel.findByIdAndUpdate(captainId, { status }, { new: true });
+    if (!captain) {
+      return res.status(404).json({ message: 'Captain not found' });
+    }
+    res.status(200).json({ message: 'Status updated', captain });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update status' });
+  }
+}

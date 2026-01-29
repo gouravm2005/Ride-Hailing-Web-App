@@ -12,7 +12,7 @@ function UserProfile({ onClose }) {
 const { user, setUser } = useContext(UserDataContext);
 
   const getProfile = () => {
-    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
     if (!userAuth || !userAuth.token) {
       navigate('/Userlogin')
       return
@@ -29,7 +29,7 @@ const { user, setUser } = useContext(UserDataContext);
   }
 
   const logoutUser = () => {
-    const userAuth = JSON.parse(localStorage.getItem('userAuth'))
+    const userAuth = JSON.parse(sessionStorage.getItem('userAuth'))
     if (!userAuth || !userAuth.token) {
       navigate('/Userlogin')
       return

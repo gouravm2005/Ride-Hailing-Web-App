@@ -6,16 +6,16 @@ export default function AuthProvider({ children }) {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("userAuth"));
-    const storedCaptain = JSON.parse(localStorage.getItem("captainAuth"));
+    const storedUser = JSON.parse(sessionStorage.getItem("userAuth"));
+    const storedCaptain = JSON.parse(sessionStorage.getItem("captainAuth"));
 
     if (storedUser) setAuth({ role: "user", ...storedUser });
     else if (storedCaptain) setAuth({ role: "captain", ...storedCaptain });
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("userAuth");
-    localStorage.removeItem("captainAuth");
+    sessionStorage.removeItem("userAuth");
+    sessionStorage.removeItem("captainAuth");
     setAuth(null);
   };
 

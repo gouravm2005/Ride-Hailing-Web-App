@@ -27,11 +27,15 @@ const Captainlogin = () => {
 
       if (response.status === 201) {
         const { token, captain } = response.data;
-        localStorage.setItem("captainAuth", JSON.stringify({ token, role: "captain" }));
-        localStorage.setItem("captain", JSON.stringify(captain));
+        // localStorage.setItem("captainAuth", JSON.stringify({ token, role: "captain" }));
+        // localStorage.setItem("captain", JSON.stringify(captain));
+        sessionStorage.removeItem("userAuth");
+        sessionStorage.removeItem("user");
+        sessionStorage.setItem("captainAuth", JSON.stringify({ token, role: "captain" }));
+        sessionStorage.setItem("captain", JSON.stringify(captain));
         setCaptain(captain); // ✅ from CaptainContext
         window.dispatchEvent(new Event("auth-changed"));
-        navigate("/CaptainHome");
+        navigate("/CaptainHome", {state: { captainId: captain._id}});
       }
     } catch (err) {
       console.error('Signup error:', err.response?.data || err.message);

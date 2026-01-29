@@ -12,6 +12,8 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-google-maps/api": "^2.20.7",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.4",
     "axios": "^1.12.2",
     "components": "^0.1.0",
     "gsap": "^3.12.7",

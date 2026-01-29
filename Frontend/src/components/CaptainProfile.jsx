@@ -12,7 +12,7 @@ function CaptainProfile({ onClose }) {
 const { captain, setCaptain } = useContext(CaptainDataContext);
 
   const getProfile = () => {
-    const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
+    const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth"));
     if (!captainAuth || !captainAuth.token) {
       navigate('/Captainlogin')
       return
@@ -29,7 +29,7 @@ const { captain, setCaptain } = useContext(CaptainDataContext);
   }
 
   const logoutCaptain = () => {
-    const captainAuth = JSON.parse(localStorage.getItem('captainAuth'))
+    const captainAuth = JSON.parse(sessionStorage.getItem('captainAuth'))
     if (!captainAuth || !captainAuth.token) {
       navigate('/Captainlogin')
       return
@@ -42,8 +42,8 @@ const { captain, setCaptain } = useContext(CaptainDataContext);
         },
       })
       .then(() => {
-        localStorage.removeItem('captainAuth')
-        localStorage.removeItem('captain')
+        sessionStorage.removeItem('captainAuth')
+        sessionStorage.removeItem('captain')
         navigate('/Captainlogin')
       })
       .catch((err) => console.error('Logout error:', err))

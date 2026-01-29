@@ -25,7 +25,17 @@ const rideSchema = new mongoose.Schema({
   otp: { type: String }, // for ride start validation
   startedAt: Date,
   completedAt: Date,
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  payment: {
+  status: {
+    type: String,
+    enum: ["pending", "paid", "failed"],
+    default: "pending"
+  },
+  method: String, // card, upi
+  transactionId: String,
+  paidAt: Date
+}
 });
 
 module.exports = mongoose.model("Ride", rideSchema);

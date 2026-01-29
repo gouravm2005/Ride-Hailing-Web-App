@@ -64,17 +64,17 @@ const captainschema = new mongoose.Schema({
   },
 location: {
   type: { type: String, enum: ["Point"], default: "Point" },
-  coordinates: { type: [Number] } // placeholder
+  coordinates: { type: [Number], default: [0, 0] } // placeholder
 },
 pickup: { type: String, default: "" },
 pickupCoordinates: {
   type: { type: String, enum: ["Point"], default: "Point" },
-  coordinates: { type: [Number], }
+  coordinates: { type: [Number], default: [0, 0] }
 },
 destination: { type: String, default: "" },
 destinationCoordinates: {
   type: { type: String, enum: ["Point"], default: "Point" },
-  coordinates: { type: [Number]}
+  coordinates: { type: [Number], default: [0, 0] }
 },
 
   rideFeePerKm: {

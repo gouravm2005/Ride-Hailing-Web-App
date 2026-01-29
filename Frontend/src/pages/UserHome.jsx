@@ -62,7 +62,7 @@ const UserHome = () => {
 
   const requestRide = async () => {
     try {
-      const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+      const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
       if (!userAuth || !userAuth.token) return;
 
       console.log(pickuplnglat);

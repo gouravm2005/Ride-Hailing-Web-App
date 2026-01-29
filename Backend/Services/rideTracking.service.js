@@ -1,6 +1,6 @@
 const Captain = require("../models/captain.model");
 const Ride = require("../models/ride.model");
-const { sendToRideRoom } = require("../socket/socketManager");
+const { sendToRideRoom } = require("../Socket/socketManager");
 
 const ACTIVE_RIDES = new Map();
 

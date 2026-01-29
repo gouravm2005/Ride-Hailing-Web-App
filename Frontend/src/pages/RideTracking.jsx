@@ -45,17 +45,25 @@ const RideTracking = () => {
 
     setRole(type);
 
+    const interval = setInterval(() => {
+
     axios
       .get(`${import.meta.env.VITE_BASE_URL}/api/ride/getUserRide/${rideId}`)
       .then((res) => {
         setRide(res.data);
         setCaptainId(res.data.captain?._id || "");
-        setLoading(false);
-      })
+        if(res.data.status === "requested")
+        setLoading(true);
+        else 
+          setLoading(false);
+        })
       .catch((err) => {
         console.error("Error fetching ride:", err);
         setLoading(false);
       });
+    }, 3000);
+       
+  return () => clearInterval(interval);
   }, [rideId]);
 
 
@@ -81,6 +89,16 @@ const RideTracking = () => {
     };
   }, [rideId, ride]);
 
+  useEffect(() => {
+    if (!ride) return;
+    if (ride.status === "completed") {
+      axios.post(`${import.meta.env.VITE_BASE_URL}/api/ride/completeRide/${ride._id}`, { captainId: captainId });
+      if(role === "user")
+      navigate("/Payment", { state: { rideId: ride._id, captainId: captainId } });
+      else
+        navigate("/CaptainHome");
+    }
+  }, [rideId, ride]);
 
   const handleVerifyOtp = async () => {
     if (!enteredOtp || !ride) {
@@ -90,12 +108,12 @@ const RideTracking = () => {
 
     try {
       const headers = {};
-      const captainAuth = JSON.parse(localStorage.getItem("captainAuth")) || {};
+      const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth")) || {};
       const token =
         captainAuth.token ||
         captainAuth?.data?.token ||
         captainAuth?.captain?.token ||
-        localStorage.getItem("captainToken");
+        sessionStorage.getItem("captainToken");
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
@@ -120,12 +138,12 @@ const RideTracking = () => {
 
     try {
       const headers = {};
-      const captainAuth = JSON.parse(localStorage.getItem("captainAuth")) || {};
+      const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth")) || {};
       const token =
         captainAuth.token ||
         captainAuth?.data?.token ||
         captainAuth?.captain?.token ||
-        localStorage.getItem("captainToken");
+        sessionStorage.getItem("captainToken");
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
@@ -146,7 +164,10 @@ const RideTracking = () => {
     }
   };
 
-  if (loading) return <div className="p-6 text-center">Loading ride...</div>;
+  if (loading) return <div className="p-6 text-center">
+    <p className="text-gray-700">Ride Requested, Wait for captain's response</p>
+     <span><button onClick={() => navigate("/UserRides")} className="bg-blue-500 text-white px-4 py-2 rounded-md">My Rides</button> <button onClick={() => navigate("/UserHome")} className="bg-blue-500 text-white px-4 py-2 rounded-md">Home</button></span>
+  </div>;
   if (!ride) return <div className="p-6 text-center">Ride not found</div>;
 
   const { user, captain, pickup, destination, fare, otp, status } = ride;

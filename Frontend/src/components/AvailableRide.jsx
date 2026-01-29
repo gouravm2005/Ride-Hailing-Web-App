@@ -10,7 +10,7 @@ const AvailableRide = ({ onSelectCaptain, selectedRideType, panelOpen }) => {
 const { user, setUser } = useContext(UserDataContext);
 
   useEffect(() => {
-    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
     if (!userAuth || !userAuth.token)
       return;
 

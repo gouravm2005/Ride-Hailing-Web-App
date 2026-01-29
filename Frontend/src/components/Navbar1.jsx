@@ -14,7 +14,7 @@ const Navbar1 = () => {
   const { captain, setCaptain } = useContext(CaptainDataContext);
 
   useEffect(() => {
-    const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
+    const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth"));
     if (captainAuth?.role) {
       setRole(captainAuth.role);
       console.log(captainAuth.role);

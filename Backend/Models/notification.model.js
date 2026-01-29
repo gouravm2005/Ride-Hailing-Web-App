@@ -10,12 +10,14 @@ const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: [
-      "requested",  // User requested ride
-      "accepted",   // Captain accepted ride
-      "rejected",   // Captain rejected ride 
-      "started",    // Ride started
-      "completed",  // Ride completed
-      "cancelled"   // Ride cancelled
+      "requested",      // User requested ride (legacy)
+      "accepted",       // Captain accepted ride (legacy)
+      "rejected",       // Captain rejected ride 
+      "started",        // Ride started
+      "completed",      // Ride completed
+      "cancelled",      // Ride cancelled
+      "rideRequested",  // New: User requested ride (for captain popup)
+      "rideAccepted"    // New: Captain accepted ride (for user popup)
     ],
     required: true
   },

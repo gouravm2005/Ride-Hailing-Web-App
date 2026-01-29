@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "./SocketProvider";
 
 function NotificationsPage({ role }) {
-  const { notifications, setNotifications } = useContext(NotificationContext);
+  // const { notifications, setNotifications } = useContext(NotificationContext);
+  const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
@@ -13,10 +14,10 @@ function NotificationsPage({ role }) {
   useEffect(() => {
     const detectRoleAndId = () => {
       try {
-        const userAuth = JSON.parse(localStorage.getItem("userAuth"));
-        const captainAuth = JSON.parse(localStorage.getItem("captainAuth"));
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        const storedCaptain = JSON.parse(localStorage.getItem("captain"));
+        const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
+        const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth"));
+        const storedUser = JSON.parse(sessionStorage.getItem("user"));
+        const storedCaptain = JSON.parse(sessionStorage.getItem("captain"));
 
         if (storedUser?._id || userAuth?.user?._id) {
           setUserId(storedUser?._id || userAuth?.user?._id);
@@ -49,7 +50,7 @@ function NotificationsPage({ role }) {
       }
     };
     fetchNotifications();
-  }, [userId, role, setNotifications]);
+  }, [userId, role]);
 
   // Stable navigation handler
   const handleBack = () => {

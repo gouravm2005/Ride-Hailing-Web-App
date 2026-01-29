@@ -15,7 +15,7 @@ function UserRides() {
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const auth = JSON.parse(localStorage.getItem("userAuth"));
+        const auth = JSON.parse(sessionStorage.getItem("userAuth"));
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/ride/getAllUserRides`,
           { headers: { Authorization: `Bearer ${auth.token}` } }

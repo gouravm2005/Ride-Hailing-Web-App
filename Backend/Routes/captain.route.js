@@ -34,5 +34,6 @@ router.get('/logout', Authmiddleware.AuthCaptain, captainController.logoutCaptai
 
 router.get("/getCaptainETA", captainController.getCaptainETA);
 
+router.post("/update-captain-status", captainController.updateCaptainStatus);
 
 module.exports = router;

@@ -27,8 +27,12 @@ const Userlogin = () => {
 
       if (response.status === 201) {
         const { token, user } = response.data;
-        localStorage.setItem("userAuth", JSON.stringify({ token: token, role: "user" }));
-        localStorage.setItem("user", JSON.stringify(user));
+        // localStorage.setItem("userAuth", JSON.stringify({ token: token, role: "user" }));
+        // localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.removeItem("captainAuth");
+        sessionStorage.removeItem("captain");
+        sessionStorage.setItem("userAuth", JSON.stringify({ token: token, role: "user" }));
+        sessionStorage.setItem("user", JSON.stringify(user));
         setUser(user); 
         window.dispatchEvent(new Event("auth-changed"));
         navigate("/UserHome");

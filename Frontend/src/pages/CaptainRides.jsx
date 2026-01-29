@@ -14,7 +14,7 @@ function CaptainRides() {
 
   useEffect(() => {
     const fetchRides = async () => {
-      const auth = JSON.parse(localStorage.getItem("captainAuth"));
+      const auth = JSON.parse(sessionStorage.getItem("captainAuth"));
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/api/ride/getAllCaptainRides`,

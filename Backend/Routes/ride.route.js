@@ -18,5 +18,6 @@ router.get("/getUserRide/:id", rideController.getUserRide);
 router.get("/getAllCaptainRides", Authmiddleware.AuthCaptain, rideController.getAllCaptainRides);
 router.get("/getCaptainRide/:id", rideController.getCaptainRide);
 router.get("/getRideETA", rideController.getRideETA);
+router.post("/markPaid/:id", rideController.markPaid);
 
 module.exports = router;

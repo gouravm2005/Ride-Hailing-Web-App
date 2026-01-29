@@ -14,7 +14,7 @@ function Navbar2() {
 const { user, setUser } = useContext(UserDataContext);
 
   useEffect(() => {
-    const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+    const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
     if (userAuth?.role) {
       setRole(userAuth.role);
     }

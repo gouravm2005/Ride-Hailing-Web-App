@@ -4,7 +4,7 @@ const Captain = require('../models/captain.model')
 const Ride = require('../models/ride.model')
 const User = require('../models/user.model')
 const { createNotification } = require("./notificationController");
-const { sendToUser, sendToRideRoom, sendNotification } = require("../socket/socketManager");
+const { sendToUser, sendToCaptain, sendToRideRoom, sendNotification } = require("../Socket/socketManager");
 const Notification = require('../models/notification.model');
 const { startRideSimulation } = require("../Services/rideTracking.service");
 
@@ -238,22 +238,27 @@ module.exports.requestRide = async (req, res) => {
 
     await ride.save();
 
-    // create notification for captain
-    const notif = await Notification.create({
-      ride: ride._id,
-      sender: req.user._id,
-      senderModel: "User",
-      receiver: captainId,
-      receiverModel: "Captain",
-      type: "requested",
-      title: "New Ride Request",
-      message: `A user requested a ride from ${pickup} to ${destination}`,
-    });
+      // create notification for captain (type: rideRequested)
+      const notif = await Notification.create({
+        ride: ride._id,
+        sender: req.user._id,
+        senderModel: "User",
+        receiver: captainId,
+        receiverModel: "Captain",
+        type: "rideRequested",
+        title: "New Ride Request",
+        message: `A user requested a ride from ${pickup} to ${destination}`,
+      });
 
-    // try real-time send. event = 'rideRequest' or 'receiveNotification'
-    const sent = sendToUser(captainId, "receiveNotification", notif);
-    // optionally log if not sent (captain offline)
-    if (!sent) console.log("Captain offline, notification saved for later.");
+      // Real-time send with rideId in payload
+      const notifPayload = {
+        ...notif.toObject(),
+        type: "rideRequested",
+        rideId: ride._id,
+      };
+      const sent = sendToCaptain(captainId, "receiveNotification", notifPayload);
+      // optionally log if not sent (captain offline)
+      if (!sent) console.log("Captain offline, notification saved for later.");
 
     return res.status(201).json({
       notif,
@@ -269,34 +274,47 @@ module.exports.acceptRide = async (req, res) => {
   try {
     const rideId = req.params.id;
     const captainId = req.captain?._id;
+
     if (!captainId) {
-    return res.status(401).json({ message: "Captain authentication failed" });
+      return res.status(401).json({ message: "Captain authentication failed" });
     }
+
     const ride = await Ride.findById(rideId);
     if (!ride) return res.status(404).json({ message: "Ride not found" });
+
     ride.status = "accepted";
     ride.captain = captainId;
     await ride.save();
+
+    const userId = ride.user.toString();
     const captain = await Captain.findById(captainId);
-    captain.rideStats.ridesAccepted = (captain.rideStats.ridesAccepted || 0) + 1;
+
+    captain.rideStats.ridesAccepted =
+      (captain.rideStats.ridesAccepted || 0) + 1;
     await captain.save();
-    const notifUser = await Notification.create({
+
+    const notif = await Notification.create({
       ride: ride._id,
       sender: captainId,
       senderModel: "Captain",
-      receiver: ride.user,
+      receiver: userId,
       receiverModel: "User",
-      type: "accepted",
+      type: "rideAccepted",
       title: "Ride Accepted",
-      message: "Your ride has been accepted",
+      message: `Captain ${captain?.name || ""} accepted your ride request!`,
     });
-    sendNotification(ride.user.toString(), notifUser);
-    sendToRideRoom(ride._id, "rideStatusUpdate", {
-      rideId: ride._id,
-      status: "accepted",
-    });
+
+    const notifPayload = {
+      ...notif.toObject(),
+      rideId: ride._id.toString(),
+      type: "rideAccepted",
+    };
+
+    sendToUser(userId, "receiveNotification", notifPayload);
+
     res.json({ success: true, ride });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -318,7 +336,7 @@ module.exports.rejectRide = async (req, res) => {
     await ride.save();
 
     const captain = await Captain.findById(captainId);
-    captain.rideStats.ridesRejected = (captain.rideStats.ridesRejected || 0) + 1;
+    captain.rideStats.ridesRejected = (captain.dailyStats.ridesRejected || 0) + 1;
     await captain.save();
 
     const notifUser = await Notification.create({
@@ -332,7 +350,7 @@ module.exports.rejectRide = async (req, res) => {
       message: "Captain rejected the ride",
     });
 
-    sendNotification(ride.user.toString(), notifUser);
+    // sendNotification(ride.user.toString(), notifUser);
     sendToRideRoom(ride._id, "rideStatusUpdate", {
       rideId: ride._id,
       status: "cancelled",
@@ -374,10 +392,6 @@ module.exports.startRide = async (req, res) => {
     ride.startedAt = new Date();
     await ride.save();
 
-    const captain = await Captain.findById(captainId);
-    captain.rideStats.distanceCovered = (captain.rideStats.distanceCovered || 0) + ride.distance;
-    await captain.save();
-
     startRideSimulation(ride._id.toString());
   } catch (err) {
     console.error(err);
@@ -389,10 +403,15 @@ module.exports.startRide = async (req, res) => {
 module.exports.completeRide = async (req, res) => {
   try {
     const rideId = req.params.id || req.body.rideId;
+    const captainId = req.body.captainId;
     const ride = await Ride.findById(rideId);
     if (!ride) return res.status(404).json({ message: 'Ride not found' });
     ride.status = "completed";
     await ride.save();
+
+    const captain = await Captain.findById(captainId);
+    captain.rideStats.distanceCovered = (captain.dailyStats.distanceCovered || 0) + ride.distance;
+    await captain.save();
 
     const notifUser = await Notification.create({
       ride: ride._id,
@@ -529,6 +548,21 @@ module.exports.getRideETA = async (req, res) => {
   } catch (err) {
     console.error("OSRM error:", err.message);
     return { distance: 0, duration: 0 };
+  }
+}
+
+module.exports.markPaid = async (req, res) => {
+  try {
+    const rideId = req.params.id;
+    const ride = await Ride.findById(rideId);
+    if (!ride) return res.status(404).json({ message: 'Ride not found' });
+    ride.payment.status = "paid";
+    await ride.save();
+    res.json({ success: true, ride });
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 }
 

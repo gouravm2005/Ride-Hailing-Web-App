@@ -8,7 +8,7 @@ exports.createNotification = async (data, io) => {
 
     // Emit real-time to receiver
     const { receiver, message } = notification;
-    const { sendNotification } = require("../socket/socketManager");
+    const { sendNotification } = require("../Socket/socketManager");
     sendNotification(io, receiver.toString(), notification);
 
     return notification;

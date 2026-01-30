@@ -6,7 +6,6 @@ import { useContext } from "react";
 import { CaptainDataContext } from "../context/CaptainContext";
 
 function CaptainProfile({ onClose }) {
-  // const [captain, setCaptain] = useState(null)
   const navigate = useNavigate()
 
 const { captain, setCaptain } = useContext(CaptainDataContext);

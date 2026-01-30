@@ -79,6 +79,7 @@ destinationCoordinates: {
 
   rideFeePerKm: {
     type: Number,
+    enum: [10, 15, 20],
     default: 10
   },
 

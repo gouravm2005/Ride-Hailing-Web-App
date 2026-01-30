@@ -15,7 +15,7 @@ const { user, setUser } = useContext(UserDataContext);
       return;
 
     axios.get(`${import.meta.env.VITE_BASE_URL}/api/captain/getAvailableCaptain`)
-      .then((res) => { setmockCaptains(res.data) })
+      .then((res) => { setmockCaptains(res.data), console.log(res.data) })
       .catch(err => console.error("Error fetching captains:", err));
   }, [])
 
@@ -27,7 +27,7 @@ const { user, setUser } = useContext(UserDataContext);
       </div>
 
       <div className="space-y-4">
-        {mockCaptains.map((captain) => (
+        {mockCaptains.filter((captain) => captain.vehicle.vehicleType === selectedRideType).map((captain) => (
           <div
             key={captain._id}
             onClick={() => onSelectCaptain && onSelectCaptain(captain._id)}

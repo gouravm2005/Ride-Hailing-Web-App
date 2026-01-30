@@ -54,10 +54,6 @@ module.exports.loginUser = async(req, res, next) => {
 
  const token = user.generateAuthToken();
 
-//  res.cookie('token',token)
-
-//  localStorage.setItem("auth", JSON.stringify({ token: res.data.token }));
-
  res.status(201).json({ token, user});
 }
 

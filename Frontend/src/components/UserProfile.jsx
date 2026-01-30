@@ -6,7 +6,6 @@ import { useContext } from "react";
 import { UserDataContext } from "../context/UserContext";
 
 function UserProfile({ onClose }) {
-  // const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
 const { user, setUser } = useContext(UserDataContext);
@@ -42,8 +41,8 @@ const { user, setUser } = useContext(UserDataContext);
         },
       })
       .then(() => {
-        localStorage.removeItem('userAuth')
-        localStorage.removeItem('user')
+        sessionStorage.removeItem('userAuth')
+        sessionStorage.removeItem('user')
         navigate('/Userlogin')
       })
       .catch((err) => console.error('Logout error:', err))

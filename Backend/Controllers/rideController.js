@@ -4,13 +4,13 @@ const Captain = require('../models/captain.model')
 const Ride = require('../models/ride.model')
 const User = require('../models/user.model')
 const { createNotification } = require("./notificationController");
-const { sendToUser, sendToCaptain, sendToRideRoom, sendNotification } = require("../Socket/socketManager");
+const { sendToUser, sendToCaptain, sendToRideRoom} = require("../Socket/socketManager");
 const Notification = require('../models/notification.model');
 const { startRideSimulation } = require("../Services/rideTracking.service");
 
 module.exports.getLocationSuggestions = async (req, res) => {
   try {
-      res.set("Cache-Control", "no-store");
+    res.set("Cache-Control", "no-store");
     const { query } = req.query;
     if (!query) return res.json({ suggestions: [] });
 
@@ -51,7 +51,7 @@ async function getCoordinates(placeName) {
 
     const res = await axios.get("https://nominatim.openstreetmap.org/search", {
       params: { q: placeName, format: "json", limit: 1 },
-      headers: { "User-Agent": "RideApp/1.0" }, 
+      headers: { "User-Agent": "RideApp/1.0" },
     });
 
     if (res.data && res.data.length > 0) {
@@ -133,7 +133,7 @@ module.exports.updateCaptainLocation = async (req, res) => {
       const randomCoords = addRandomOffset(
         pickuplnglat.lat,
         pickuplnglat.lng,
-        1 // within 1 km
+        1 
       );
 
       return Captain.findByIdAndUpdate(
@@ -149,7 +149,6 @@ module.exports.updateCaptainLocation = async (req, res) => {
             type: "Point",
             coordinates: [destinationlnglat.lng, destinationlnglat.lat],
           },
-          // 🚕 Each captain → slightly different random location
           location: {
             type: "Point",
             coordinates: [randomCoords.lng, randomCoords.lat],
@@ -226,8 +225,8 @@ module.exports.requestRide = async (req, res) => {
     const ride = new Ride({
       user: req.user._id,
       captain: captainId,
-      pickup: {address : pickup, lat: pickuplnglat.lat, lng: pickuplnglat.lng},
-      destination : {address : destination, lat: destinationlnglat.lat, lng:destinationlnglat.lng},
+      pickup: { address: pickup, lat: pickuplnglat.lat, lng: pickuplnglat.lng },
+      destination: { address: destination, lat: destinationlnglat.lat, lng: destinationlnglat.lng },
       ridetype: rideType,
       fare,
       distance,
@@ -238,27 +237,29 @@ module.exports.requestRide = async (req, res) => {
 
     await ride.save();
 
-      // create notification for captain (type: rideRequested)
-      const notif = await Notification.create({
-        ride: ride._id,
-        sender: req.user._id,
-        senderModel: "User",
-        receiver: captainId,
-        receiverModel: "Captain",
-        type: "rideRequested",
-        title: "New Ride Request",
-        message: `A user requested a ride from ${pickup} to ${destination}`,
-      });
+    // create notification for captain (type: rideRequested)
+    const notif = await Notification.create({
+      ride: ride._id,
+      sender: req.user._id,
+      senderModel: "User",
+      receiver: captainId,
+      receiverModel: "Captain",
+      type: "rideRequested",
+      title: "New Ride Request",
+      message: `A user requested a ride from ${pickup} to ${destination}`,
+    });
 
-      // Real-time send with rideId in payload
-      const notifPayload = {
-        ...notif.toObject(),
-        type: "rideRequested",
-        rideId: ride._id,
-      };
-      const sent = sendToCaptain(captainId, "receiveNotification", notifPayload);
-      // optionally log if not sent (captain offline)
-      if (!sent) console.log("Captain offline, notification saved for later.");
+    const sent = sendToCaptain(captainId, "receiveNotification", {
+      type: "rideRequested",
+      category: "action",
+      autoClose: false,
+      receiverRole: "captain",
+
+      title: "Ride Requested",
+      message: `User requested a ride from ${pickup} to ${destination}`,
+      rideId: ride._id,
+    });
+    if (!sent) console.log("Captain offline, notification saved for later.");
 
     return res.status(201).json({
       notif,
@@ -289,8 +290,8 @@ module.exports.acceptRide = async (req, res) => {
     const userId = ride.user.toString();
     const captain = await Captain.findById(captainId);
 
-    captain.rideStats.ridesAccepted =
-      (captain.rideStats.ridesAccepted || 0) + 1;
+    captain.dailyStats.ridesAccepted =
+      (captain.dailyStats.ridesAccepted || 0) + 1;
     await captain.save();
 
     const notif = await Notification.create({
@@ -304,13 +305,16 @@ module.exports.acceptRide = async (req, res) => {
       message: `Captain ${captain?.name || ""} accepted your ride request!`,
     });
 
-    const notifPayload = {
-      ...notif.toObject(),
-      rideId: ride._id.toString(),
+    sendToUser(userId, "receiveNotification", {
       type: "rideAccepted",
-    };
+      category: "action",
+      autoClose: false,
+      receiverRole: "user",
 
-    sendToUser(userId, "receiveNotification", notifPayload);
+      title: "Ride Accepted",
+      message: "Captain accepted your ride",
+      rideId: ride._id,
+    });
 
     res.json({ success: true, ride });
   } catch (err) {
@@ -325,8 +329,8 @@ module.exports.rejectRide = async (req, res) => {
     const rideId = req.params.id;
     const captainId = req.captain?._id;
 
-     if (!captainId) {
-    return res.status(401).json({ message: "Captain authentication failed" });
+    if (!captainId) {
+      return res.status(401).json({ message: "Captain authentication failed" });
     }
 
     const ride = await Ride.findById(rideId);
@@ -336,7 +340,7 @@ module.exports.rejectRide = async (req, res) => {
     await ride.save();
 
     const captain = await Captain.findById(captainId);
-    captain.rideStats.ridesRejected = (captain.dailyStats.ridesRejected || 0) + 1;
+    captain.dailyStats.ridesRejected = (captain.dailyStats.ridesRejected || 0) + 1;
     await captain.save();
 
     const notifUser = await Notification.create({
@@ -345,15 +349,20 @@ module.exports.rejectRide = async (req, res) => {
       senderModel: "Captain",
       receiver: ride.user,
       receiverModel: "User",
-      type: "cancelled",
+      type: "RideRejected",
       title: "Ride Rejected",
       message: "Captain rejected the ride",
     });
 
-    // sendNotification(ride.user.toString(), notifUser);
-    sendToRideRoom(ride._id, "rideStatusUpdate", {
+    sendToUser(ride.user, "receiveNotification", {
+      type: "rideRejected",
+      category: "info",
+      autoClose: true,
+      receiverRole: "user",
+
+      title: "Ride Rejected",
+      message: "Captain rejected your ride request",
       rideId: ride._id,
-      status: "cancelled",
     });
 
     res.json({ success: true });
@@ -393,6 +402,31 @@ module.exports.startRide = async (req, res) => {
     await ride.save();
 
     startRideSimulation(ride._id.toString());
+
+    const notifUser = await Notification.create({
+      ride: ride._id,
+      sender: ride.captain,
+      senderModel: "Captain",
+      receiver: ride.user,
+      receiverModel: "User",
+      type: "RideStarted",
+      title: "Ride Started",
+      message: "Your ride has started",
+    });
+
+    sendToUser(ride.user.toString(), "receiveNotification",
+      {
+        type: "rideStarted",
+        category: "info",
+        autoClose: true,
+        receiverRole: "user",
+
+        title: "Ride Started",
+        message: "Your ride has started",
+        rideId: ride._id,
+      }
+    );
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -410,7 +444,7 @@ module.exports.completeRide = async (req, res) => {
     await ride.save();
 
     const captain = await Captain.findById(captainId);
-    captain.rideStats.distanceCovered = (captain.dailyStats.distanceCovered || 0) + ride.distance;
+    captain.dailyStats.distanceCovered = (captain.dailyStats.distanceCovered || 0) + ride.distance;
     await captain.save();
 
     const notifUser = await Notification.create({
@@ -419,13 +453,21 @@ module.exports.completeRide = async (req, res) => {
       senderModel: "Captain",
       receiver: ride.user,
       receiverModel: "User",
-      type: "completed",
+      type: "RideCompleted",
       title: "Ride Completed",
       message: "Ride completed successfully",
     });
 
-    sendToUser(ride.user.toString(), "receiveNotification", notifUser);
-    sendToRideRoom(ride._id, "rideStatusUpdate", { rideId: ride._id, status: "completed" });
+    sendToUser(ride.user.toString(), "receiveNotification", {
+      type: "rideCompleted",
+      category: "info",
+      autoClose: true,
+      receiverRole: "user",
+
+      title: "Ride Completed",
+      message: "Ride completed successfully",
+      rideId: ride._id,
+    });
 
     res.json({ success: true, ride });
   } catch (err) {
@@ -459,13 +501,20 @@ module.exports.cancelRideByUser = async (req, res) => {
         senderModel: 'User',
         receiver: ride.captain,
         receiverModel: 'Captain',
-        type: 'cancelled',
+        type: 'RideCancelled',
         title: 'Ride Cancelled',
         message: 'Passenger cancelled the ride',
       });
 
-      sendToUser(String(ride.captain), 'receiveNotification', notif);
-      sendToRideRoom(ride._id, 'rideStatusUpdate', { rideId: ride._id, status: 'cancelled' });
+      sendToCaptain(String(ride.captain), 'receiveNotification', {
+        type: 'rideCancelled',
+        category: 'info',
+        autoClose: true,
+        receiverRole: 'captain',
+        title: 'Ride Cancelled',
+        message: 'Passenger cancelled the ride',
+        rideId: ride._id,
+      });
     }
 
     res.json({ success: true });
@@ -492,8 +541,8 @@ module.exports.getAllUserRides = async (req, res) => {
 module.exports.getUserRide = async (req, res) => {
   try {
     const ride = await Ride.findById(req.params.id)
-  .populate("captain", "fullname email")
-  .populate("user", "fullname email" )
+      .populate("captain", "fullname email")
+      .populate("user", "fullname email")
     if (!ride) return res.status(404).json({ message: "Ride not found" });
     res.json(ride);
   } catch (err) {
@@ -524,30 +573,48 @@ module.exports.getCaptainRide = async (req, res) => {
 };
 
 module.exports.getRideETA = async (req, res) => {
- const {pickuplnglat, destinationlnglat} = req.body;
-   try {
+  const { pickuplnglat, destinationlnglat } = req.body;
+
+  try {
     if (
-      !pickuplnglat?.lat || !pickuplnglat?.lng ||
-      !destinationlnglat?.lat || !destinationlnglat?.lng
+      !pickuplnglat?.lat ||
+      !pickuplnglat?.lng ||
+      !destinationlnglat?.lat ||
+      !destinationlnglat?.lng
     ) {
       console.error("Invalid coordinates:", pickuplnglat, destinationlnglat);
-      return { distance: 0, duration: 0 };
+      return res.status(400).json({
+        distance: 0,
+        duration: 0,
+        message: "Invalid coordinates"
+      });
     }
 
-    const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false&geometries=geojson`;
-    const res = await axios.get(url);
+    const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false`;
 
-    if (res.data.routes && res.data.routes.length > 0) {
-      const route = res.data.routes[0];
-      return {
-        distance: parseFloat((route.distance / 1000).toFixed(2)), // km
-        duration: parseInt((route.duration / 60).toFixed(0)),    // minutes
-      };
+    const osrmRes = await axios.get(url);
+
+    if (!osrmRes.data.routes?.length) {
+      return res.status(400).json({
+        distance: 0,
+        duration: 0,
+        message: "No route found"
+      });
     }
-    return { distance: 0, duration: 0 };
+
+    const route = osrmRes.data.routes[0];
+
+    return res.json({
+      distance: +(route.distance / 1000).toFixed(2), // km
+      duration: Math.round(route.duration / 60),    // minutes
+    });
   } catch (err) {
     console.error("OSRM error:", err.message);
-    return { distance: 0, duration: 0 };
+    return res.status(500).json({
+      distance: 0,
+      duration: 0,
+      message: "ETA calculation failed"
+    });
   }
 }
 

@@ -70,13 +70,11 @@ const RideTracking = () => {
   useEffect(() => {
     if (!rideId || !ride) return;
 
-    // Before ride starts, captain is at pickup
     if (ride.status !== "started") {
       setCaptainPos(ride.pickup);
       return;
     }
 
-    // After ride starts, listen for backend updates
     socket.emit("joinRide", rideId);
 
     const handleUpdate = (data) => {
@@ -91,8 +89,16 @@ const RideTracking = () => {
 
   useEffect(() => {
     if (!ride) return;
+
+    const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth"));
+    if (captainAuth?.role) {
+      setRole(captainAuth.role);
+    }
+
     if (ride.status === "completed") {
-      axios.post(`${import.meta.env.VITE_BASE_URL}/api/ride/completeRide/${ride._id}`, { captainId: captainId });
+      axios.post(`${import.meta.env.VITE_BASE_URL}/api/ride/completeRide/${ride._id}`,
+        {captainId: captainId},
+      );
       if(role === "user")
       navigate("/Payment", { state: { rideId: ride._id, captainId: captainId } });
       else
@@ -180,7 +186,7 @@ const RideTracking = () => {
       <div className="flex-1 flex flex-col md:flex-row">
         {/* Map Section */}
 
-        <div className="h-1/2 md:h-full md:w-[70%] relative">
+        <div className="h-1/2 z-0 md:h-full md:w-[70%] ">
           {pickup?.lat && destination?.lat ? (
             <MapComponent
               pickuplnglat={pickup}
@@ -254,18 +260,18 @@ const RideTracking = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 bg-gray-50">
+            <div className="flex flex-col gap-2 border border-gray-200 bg-gray-50">
               <div className="flex flex-col justify-between">
-                <span className="text-md font-semi-bold text-gray-800">
-                  pickup point
+                <span className="text-lg pb-2 font-semi-bold text-gray-800">
+                  pickup point :
                 </span>
                 <span className="text-md font-normal text-blue-600">
                   {ride.pickup.address}
                 </span>
               </div>
               <div className="flex flex-col justify-between">
-                <span className="text-md font-semi-bold text-gray-800">
-                  destination point
+                <span className="text-lg pb-2 font-semi-bold text-gray-800">
+                  destination point :
                 </span>
                 <span className="text-md font-normal text-blue-600">
                   {ride.destination.address}
@@ -356,13 +362,26 @@ const RideTracking = () => {
             {role === "user" && (
               <div className="flex flex-col md:flex-row gap-4">
                 <button
-                  onClick={() => navigate("/UserHome")}
-                  className="w-full py-3 bg-red-500 hover:bg-red-600 text-white text-lg font-semibold rounded-lg shadow transition"
+                  onClick={() => navigate("/UserRides")}
+                  className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-xl font-semibold rounded-lg shadow transition"
                 >
-                  Cancel
+                  My Rides 
                 </button>
-                <button className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-lg shadow transition">
+                <button className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-xl font-semibold rounded-lg shadow transition">
                   Contact
+                </button>
+              </div>
+            )}
+               {role === "captain" && (
+              <div className="flex flex-col md:flex-row gap-4">
+                <button
+                  onClick={() => navigate("/CaptainRides")}
+                  className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-xl font-semibold rounded-lg shadow transition"
+                >
+                  Rides 
+                </button>
+                <button onClick={() => navigate("/CaptainHome")} className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-xl font-semibold rounded-lg shadow transition">
+                  Home
                 </button>
               </div>
             )}

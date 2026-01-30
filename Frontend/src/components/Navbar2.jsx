@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import UserProfile from "./UserProfile";
 import CaptainProfile from "./CaptainProfile";
 import { useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
 
 function Navbar2() {
@@ -12,6 +14,7 @@ function Navbar2() {
   const [role, setRole] = useState("user");
 
 const { user, setUser } = useContext(UserDataContext);
+const navigate = useNavigate();
 
   useEffect(() => {
     const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
@@ -23,14 +26,35 @@ const { user, setUser } = useContext(UserDataContext);
   const handleMenu = () => setMenuOpen(!menuOpen);
   const handleProfileToggle = () => setIsProfileOpen(!isProfileOpen);
 
+  const logoutUser = () => {
+      const userAuth = JSON.parse(sessionStorage.getItem('userAuth'))
+      if (!userAuth || !userAuth.token) {
+        navigate('/Userlogin')
+        return
+      }
+  
+      axios
+        .get(`${import.meta.env.VITE_BASE_URL}/api/user/logout`, {
+          headers: {
+            Authorization: `Bearer ${userAuth.token}`,
+          },
+        })
+        .then(() => {
+          sessionStorage.removeItem('userAuth')
+          sessionStorage.removeItem('user')
+          navigate('/Userlogin')
+        })
+        .catch((err) => console.error('Logout error:', err))
+    }
+
   return (
-    <div className='w-screen h-16 flex justify-between bg-white text-blue-600 border-b-2 border-gray-300'>
+    <div className='w-screen h-16 flex justify-between bg-white text-blue-600 border-b-2 border-gray-300 relative'>
       <div className='flex gap-4 pl-3 text-xl pt-4 font-normal'>
         <div className='w-30 h-16 text-2xl font-bold flex gap-2 '>
           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
             <Car className="w-5 h-5 text-white" />
           </div>
-          <h1 className='text-blue-600'>EzRyde</h1>
+          <h1 onClick={() => navigate("/UserHome")} className='text-blue-600 cursor-pointer'>EzRyde</h1>
         </div>
         <div className='hidden md:flex gap-10 pl-14 pt-1 font-medium'>
           <h3><Link to='/UserRides'>Ride</Link></h3>
@@ -89,12 +113,12 @@ const { user, setUser } = useContext(UserDataContext);
           </svg>
         </div>
         {menuOpen && (
-          <div onClick={handleMenu} className="md:hidden flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[40%] h-screen fixed z-10 top-16 right-0 pt-8 pl-8">
+          <div className="md:hidden flex flex-col gap-4 items-start text-xl font-bold bg-white text-blue-400 w-[40%] h-screen absolute z-50 top-16 right-0 pt-8 pl-8">
             <h3><Link to='/UserRides'>Ride</Link></h3>
             <h3> {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link> }</h3>
-            <h3><Link to='/About'>About</Link></h3>
-            <h3><Link to='/Support'>Support</Link></h3>
-            <button className="w-20 h-10 border-2 rounded-md hover:border-blue-200 text-red-500 text-lg">Logout</button>
+            <h3><Link to='/About' state={{ from: "Navbar2" }}>About</Link></h3>
+            <h3><Link to='/Support' state={{ from : "Navbar2"}}>Support</Link></h3>
+            <button onClick={logoutUser} className="w-20 h-10 border-2 rounded-md hover:border-blue-200 text-red-500 text-lg">Logout</button>
           </div>
         )}
       </div>

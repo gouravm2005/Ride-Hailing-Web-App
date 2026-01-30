@@ -5,25 +5,25 @@ const RideType = ({ onSelectRide, data, panelOpen }) => {
   const rideTypes = [
     {
       id: 'bike',
-      name: 'Bike',
+      name: 'bike',
       icon: <Bike className="w-8 h-8" />,
-      price: 25,
+      price: 10,
       time: '2-5 min',
       description: 'Affordable rides on two wheels'
     },
     {
       id: 'auto',
-      name: 'Auto',
+      name: 'auto',
       icon: <Truck className="w-8 h-8" />,
-      price: 45,
+      price: 15,
       time: '3-8 min',
       description: 'Quick and comfortable auto rides'
     },
     {
       id: 'car',
-      name: 'Car',
+      name: 'car',
       icon: <Car className="w-8 h-8" />,
-      price: 85,
+      price: 20,
       time: '5-12 min',
       description: 'Premium car rides with AC'
     }
@@ -52,7 +52,7 @@ const RideType = ({ onSelectRide, data, panelOpen }) => {
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold text-gray-900">{type.name}</h4>
                 <div className="text-right">
-                  <p className="font-bold text-gray-900">₹{type.price}</p>
+                  <p className="font-bold text-gray-900">₹{type.price}<span className="text-sm text-gray-500"> per km</span></p>
                   <p className="text-sm text-gray-500">{type.time}</p>
                 </div>
               </div>

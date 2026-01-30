@@ -1,6 +1,7 @@
 const Captain = require("../models/captain.model");
 const Ride = require("../models/ride.model");
 const { sendToRideRoom } = require("../Socket/socketManager");
+const axios = require("axios");
 
 const ACTIVE_RIDES = new Map();
 
@@ -28,13 +29,10 @@ function moveTowards(from, to, km) {
   };
 }
 
-
-const axios = require("axios");
-
 async function startRideSimulation(rideId) {
   if (ACTIVE_RIDES.has(rideId)) return;
 
-  console.log("🚀 Simulation started:", rideId);
+  console.log("Simulation started:", rideId);
 
   const INTERVAL = 2000; // ms, update every 2 seconds
 
@@ -128,7 +126,6 @@ async function startRideSimulation(rideId) {
 
 
   // Start from pickup (store as [lng, lat] for GeoJSON, but always emit { lat, lng })
-  // Defensive logging
   console.log("[SIM] Initial pickup position:", ride.pickup.lat, ride.pickup.lng);
   captain.location.coordinates = [ride.pickup.lng, ride.pickup.lat];
   await captain.save();

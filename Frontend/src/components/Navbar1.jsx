@@ -4,14 +4,17 @@ import { Link } from "react-router-dom";
 import UserProfile from "./UserProfile";
 import CaptainProfile from "./CaptainProfile";
 import { useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { CaptainDataContext } from "../context/CaptainContext";
 
 const Navbar1 = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState("captain");
 
   const { captain, setCaptain } = useContext(CaptainDataContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const captainAuth = JSON.parse(sessionStorage.getItem("captainAuth"));
@@ -24,6 +27,27 @@ const Navbar1 = () => {
   const handleMenu = () => setMenuOpen(!menuOpen);
   const handleProfileToggle = () => setIsProfileOpen(!isProfileOpen);
 
+  const logoutCaptain = () => {
+    const captainAuth = JSON.parse(sessionStorage.getItem('captainAuth'))
+    if (!captainAuth || !captainAuth.token) {
+      navigate('/Captainlogin')
+      return
+    }
+
+    axios
+      .get(`${import.meta.env.VITE_BASE_URL}/api/captain/logout`, {
+        headers: {
+          Authorization: `Bearer ${captainAuth.token}`,
+        },
+      })
+      .then(() => {
+        sessionStorage.removeItem('captainAuth')
+        sessionStorage.removeItem('captain')
+        navigate('/Captainlogin')
+      })
+      .catch((err) => console.error('Logout error:', err))
+  }
+
   return (
     <div className="w-screen h-16 flex justify-between bg-white text-blue-600 border-b-2 border-black relative">
       {/* Logo Section */}
@@ -31,7 +55,7 @@ const Navbar1 = () => {
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
           <Car className="w-5 h-5 text-white" />
         </div>
-        <h1 className="text-blue-600">EzRyde</h1>
+        <h1 onClick={() => navigate("/CaptainHome")} className="text-blue-600 cursor-pointer">EzRyde</h1>
       </div>
 
       <div className="flex gap-5 pt-4 p-3 pr-8 items-center">
@@ -91,15 +115,11 @@ const Navbar1 = () => {
               <Link to="/CaptainRides">Ride</Link>
             </h3>
             <h3>
-              {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link> }
+              {role === "user" ? <Link to="/UserNotification">Notification</Link> : <Link to="/CaptainNotification">Notification</Link>}
             </h3>
-            <h3>
-              <Link to="/About">About</Link>
-            </h3>
-            <h3>
-              <Link to="/Support">Support</Link>
-            </h3>
-            <button className="w-20 h-10 border-2 rounded-md hover:border-blue-200 text-red-500 text-lg">
+            <h3><Link to='/About' state={{ from: "Navbar1" }}>About</Link></h3>
+            <h3><Link to='/Support' state={{ from: "Navbar1" }}>Support</Link></h3>
+            <button onClick={logoutCaptain} className="w-20 h-10 border-2 rounded-md hover:border-blue-200 text-red-500 text-lg">
               Logout
             </button>
           </div>

@@ -24,7 +24,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// REMOVE helmet CSP in dev (causes “default-src 'none'” issue)
 if (process.env.NODE_ENV === "production") {
   app.use(
     helmet.contentSecurityPolicy({

@@ -26,14 +26,14 @@ captainController.loginCaptain
 
 router.get('/getAvailableCaptain',captainController.getAvailableCaptain)
 
-router.get('/getCaptainDetail/:capId', captainController.getCaptainDetail)
+router.get('/getCaptainDetail/:captainId', captainController.getCaptainDetail)
 
 router.get('/profile', Authmiddleware.AuthCaptain, captainController.getCaptainProfile)
 
 router.get('/logout', Authmiddleware.AuthCaptain, captainController.logoutCaptain)
 
-router.get("/getCaptainETA", captainController.getCaptainETA);
+router.post('/getCaptainETA', Authmiddleware.AuthCaptain, captainController.getCaptainETA);
 
-router.post("/update-captain-status", captainController.updateCaptainStatus);
+router.post("/update-captain-status", Authmiddleware.AuthCaptain, captainController.updateCaptainStatus);
 
 module.exports = router;

@@ -59,7 +59,6 @@ const UserHome = () => {
     }
   }, [pickup, destination]);
 
-
   const requestRide = async () => {
     try {
       const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
@@ -80,9 +79,9 @@ const UserHome = () => {
         },
         { headers: { Authorization: `Bearer ${userAuth.token}` } }
       );
-    const ride = res.data.ride;
-    console.log("The ride id is",ride._id);
-    navigate("/rideTracking", { state: { rideId: ride._id, type: "user" } });
+      const ride = res.data.ride;
+      console.log("The ride id is", ride._id);
+      navigate("/rideTracking", { state: { rideId: ride._id, type: "user" } });
     } catch (err) {
       console.error("Error:", err);
     }
@@ -153,7 +152,6 @@ const UserHome = () => {
   };
 
   const handleConfirmRide = () => {
-    alert('Ride confirmed! Your driver will arrive soon.');
     requestRide();
     // Reset to initial state or navigate to tracking page
   };
@@ -177,7 +175,7 @@ const UserHome = () => {
       <div className="h-full w-full flex flex-col md:flex-row">
         {/* Map Section */}
 
-        <div className="h-1/2 md:h-full md:flex-1 relative">
+        <div className="h-1/2 md:h-full z-0 md:z-0 md:flex-1 relative">
           {pickuplnglat?.lat &&
             pickuplnglat?.lng &&
             destinationlnglat?.lat &&
@@ -321,6 +319,8 @@ const UserHome = () => {
             capId={selectedCaptain}
             onConfirm={handleConfirmRide}
             onCancel={handleCancelRide}
+            pickuplnglat={pickuplnglat}
+            destinationlnglat={destinationlnglat}
           />
         )}
       </div>
@@ -347,6 +347,8 @@ const UserHome = () => {
                 capId={selectedCaptain}
                 onConfirm={handleConfirmRide}
                 onCancel={handleCancelRide}
+                pickuplnglat={pickuplnglat}
+                destinationlnglat={destinationlnglat}
               />
             )}
           </div>

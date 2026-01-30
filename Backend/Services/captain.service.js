@@ -19,7 +19,8 @@ module.exports.createCaptain = async({
   plate,
   capacity,
   vehicleType
-  }
+  },
+  rideFeePerKm: vehicleType === 'bike' ? 10 : vehicleType === 'auto' ? 15 : 20
  })
  return captain;
 }

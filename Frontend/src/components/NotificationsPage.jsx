@@ -5,12 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "./SocketProvider";
 
 function NotificationsPage({ role }) {
-  // const { notifications, setNotifications } = useContext(NotificationContext);
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
-  // Detect role and ID synchronously on mount
   useEffect(() => {
     const detectRoleAndId = () => {
       try {

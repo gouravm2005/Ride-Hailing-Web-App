@@ -22,8 +22,6 @@ import UserPrivateRoute from './components/UserPrivateRoute'
 import CaptainPrivateRoute from './components/CaptainPrivateRoute'
 
 import SocketProvider from './components/SocketProvider';
-import NotificationPopup from './components/NotificationPopup';
-import ProtectedRoute from './components/ProtectedRoute';
 import Payment from './pages/Payment';
 import UserLayout from './pages/UserLayout';
 import CaptainLayout from './pages/CaptainLayout';

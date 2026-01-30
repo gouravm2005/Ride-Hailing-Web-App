@@ -89,7 +89,7 @@ module.exports.getAvailableCaptain = async (req, res, next) => {
 
 module.exports.getCaptainDetail = async (req, res, next) => {
    try {
-    const captain = await captainModel.findOne({ _id: req.params.capId });
+    const captain = await captainModel.findOne({ _id: req.params.captainId });
     if (!captain) return res.status(404).json({ message: 'Captain not found' });
     res.status(200).json(captain);
   } catch (err) {
@@ -131,33 +131,42 @@ module.exports.logoutCaptain = async (req, res, next) => {
    res.status(200).json({ message: 'Logged out' });
 }
 
-module.exports.getCaptainETA = async (req, res, next) => {
- const {pickuplnglat, destinationlnglat} = req.body;
-   try {
-     if (
-       !pickuplnglat?.lat || !pickuplnglat?.lng ||
-       !destinationlnglat?.lat || !destinationlnglat?.lng
-     ) {
-       console.error("Invalid coordinates:", pickuplnglat, destinationlnglat);
-       return { distance: 0, duration: 0 };
-     }
- 
-     const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false&geometries=geojson`;
-     const res = await axios.get(url);
- 
-     if (res.data.routes && res.data.routes.length > 0) {
-       const route = res.data.routes[0];
-       return {
-         distance: parseFloat((route.distance / 1000).toFixed(2)), // km
-         duration: parseInt((route.duration / 60).toFixed(0)),    // minutes
-       };
-     }
-     return { distance: 0, duration: 0 };
-   } catch (err) {
-     console.error("OSRM error:", err.message);
-     return { distance: 0, duration: 0 };
-   }
-}
+
+module.exports.getCaptainETA = async (req, res) => {
+  const { pickuplnglat, destinationlnglat } = req.body;
+
+  if (
+    !pickuplnglat ||
+    !destinationlnglat ||
+    typeof pickuplnglat.lat !== "number" ||
+    typeof pickuplnglat.lng !== "number" ||
+    typeof destinationlnglat.lat !== "number" ||
+    typeof destinationlnglat.lng !== "number"
+  ) {
+    console.error("Invalid coordinates:", pickuplnglat, destinationlnglat);
+    return res.status(400).json({ distance: 0, duration: 0 });
+  }
+
+  try {
+    const url = `http://router.project-osrm.org/route/v1/driving/${pickuplnglat.lng},${pickuplnglat.lat};${destinationlnglat.lng},${destinationlnglat.lat}?overview=false`;
+
+    const osrmRes = await axios.get(url);
+
+    if (osrmRes.data.routes?.length) {
+      const route = osrmRes.data.routes[0];
+
+      return res.json({
+        distance: Number((route.distance / 1000).toFixed(2)), // km
+        duration: Math.round(route.duration / 60) // minutes
+      });
+    }
+
+    return res.json({ distance: 0, duration: 0 });
+  } catch (err) {
+    console.error("OSRM error:", err.message);
+    return res.status(500).json({ distance: 0, duration: 0 });
+  }
+};
 
 module.exports.updateCaptainStatus = async (req, res, next) => {
   try {

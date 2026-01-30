@@ -10,7 +10,6 @@ import axios from "axios";
 import { carIcon } from "../utils/carIcon";
 import "leaflet/dist/leaflet.css";
 
-/* ---------------- Fit bounds ---------------- */
 const FitBounds = ({ points }) => {
   const map = useMap();
 
@@ -23,12 +22,9 @@ const FitBounds = ({ points }) => {
   return null;
 };
 
-/* ---------------- Map Component ---------------- */
-
 const MapComponent = ({ pickuplnglat, destinationlnglat, captainPos, rideStatus }) => {
   const [route, setRoute] = useState([]);
 
-  // Always fetch the real route between pickup and destination
   useEffect(() => {
     if (!pickuplnglat || !destinationlnglat) return;
     axios
@@ -49,18 +45,15 @@ const MapComponent = ({ pickuplnglat, destinationlnglat, captainPos, rideStatus 
         } else if (res.data?.coordinates) {
           coords = res.data.coordinates;
         }
-        // Defensive: ensure all points are [lat, lng] and not swapped
-        // OSRM and many APIs return [lng, lat], so swap to [lat, lng]
+      
         const formatted = coords
           .map((pt) => {
             if (Array.isArray(pt) && pt.length === 2) {
-              // If both numbers, and in India (lat ~ 8-37, lng ~ 68-97)
-              // If first is > 50, it's likely lng, so swap
               if (pt[0] > 50 && pt[1] >= 8 && pt[1] <= 37) {
                 // [lng, lat] -> [lat, lng]
                 return [Number(pt[1]), Number(pt[0])];
               }
-              // If first is in lat range, keep as is
+            
               return [Number(pt[0]), Number(pt[1])];
             }
             return pt;
@@ -79,17 +72,13 @@ const MapComponent = ({ pickuplnglat, destinationlnglat, captainPos, rideStatus 
     return [28.7041, 77.1025];
   }, [pickuplnglat]);
 
-  // Captain marker logic:
-  // - Before ride starts: at pickup
-  // - After ride starts: at backend-provided captainPos (from socket)
-  // The car marker should always use backend-provided captainPos after ride starts
   let captainPosition = pickuplnglat;
   if (rideStatus === "started" && captainPos && captainPos.lat && captainPos.lng) {
     captainPosition = captainPos;
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full rounded-lg overflow-hidden">
       <MapContainer
         center={center}
         zoom={13}

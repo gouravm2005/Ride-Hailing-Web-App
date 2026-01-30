@@ -4,8 +4,6 @@ import axios from "axios";
 import { useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 
-// Stripe only supports card payments in India for most test/demo accounts.
-// We'll show a UI for UPI/Netbanking, but only card will work with Stripe.
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = ({ rideId }) => {
@@ -17,7 +15,6 @@ const CheckoutForm = ({ rideId }) => {
   const [success, setSuccess] = useState(false);
   const [method, setMethod] = useState("card");
 
-  // Call backend to update ride status after payment
   const markRidePaid = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_BASE_URL}/api/ride/markPaid/${rideId}`);
@@ -33,7 +30,7 @@ const CheckoutForm = ({ rideId }) => {
     setError(null);
 
     try {
-      // Only card is supported in this demo
+      // Only card is supported
       if (method !== "card") {
         setError("Only card payments are supported in this demo.");
         setLoading(false);
@@ -125,7 +122,6 @@ const CheckoutForm = ({ rideId }) => {
 
 const Payment = () => {
   const location = useLocation();
-  // Accept both {rideId} and rideId directly for compatibility
   const rideId = location.state?.rideId || location.state;
   return (
     <Elements stripe={stripePromise}>

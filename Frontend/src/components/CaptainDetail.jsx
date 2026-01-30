@@ -3,10 +3,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CaptainDetail = ({ capId, onConfirm, onCancel }) => {
-  const [selectedPayment, setSelectedPayment] = useState('cash');
+const CaptainDetail = ({ capId, onConfirm, onCancel, pickuplnglat, destinationlnglat}) => {
   const [captain, setCaptain] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [distance, setdistance] = useState(0);
+  const [duration, setduration] = useState(0);
   const hasFetched = useRef(false);
 
   const navigate = useNavigate();
@@ -37,19 +38,51 @@ useEffect(() => {
   getCaptain();
 }, [capId]);
 
-// Watch captain updates
 useEffect(() => {
   if (captain) {
     console.log("Captain state updated:", captain);
   }
 }, [captain]);
 
-  const paymentMethods = [
-    { id: 'cash', name: 'Cash', icon: '💵' },
-    { id: 'card', name: 'Credit/Debit Card', icon: '💳' },
-    { id: 'upi', name: 'UPI Payment', icon: '📱' },
-    { id: 'wallet', name: 'Wallet', icon: '👛' }
-  ];
+const getRideETA = async () => {
+  try {
+    const userAuth = JSON.parse(sessionStorage.getItem("userAuth"));
+    if (!userAuth || !userAuth.token) return;
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/api/ride/getRideETA`,
+      {
+        pickuplnglat,
+        destinationlnglat
+      }
+      , {
+        headers: {
+          Authorization: `Bearer ${userAuth.token}`,
+        },
+      }
+    );
+    setdistance(res.data.distance);
+    setduration(res.data.duration);
+  } catch (err) {
+    console.error(
+      "ETA error:",
+      err.response?.status,
+      err.response?.data
+    );
+  }
+};
+
+ useEffect(() => {
+    if (
+      pickuplnglat?.lat &&
+      pickuplnglat?.lng &&
+      destinationlnglat?.lat &&
+      destinationlnglat?.lng
+    ) {
+      console.log("this is pickuplnglat and destinationlnglat", pickuplnglat, destinationlnglat);
+      getRideETA();
+    }
+  }, [pickuplnglat, destinationlnglat]);
 
   return (
     <div className="bg-white p-6 h-full overflow-y-auto">
@@ -139,35 +172,24 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Payment Methods */}
+      {/* Ride Details */}
       <div className="border border-gray-200 rounded-lg p-4 mb-6">
-        <h5 className="font-semibold text-gray-800 mb-3">Payment Method</h5>
-        <div className="space-y-2">
-          {paymentMethods.map((method) => (
-            <label
-              key={method.id}
-              className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-            >
-              <input
-                type="radio"
-                name="payment"
-                value={method.id}
-                checked={selectedPayment === method.id}
-                onChange={(e) => setSelectedPayment(e.target.value)}
-                className="mr-3"
-              />
-              <span className="text-lg mr-3">{method.icon}</span>
-              <span className="font-medium">{method.name}</span>
-            </label>
-          ))}
-        </div>
+        <h5 className="flex flex-col gap-6 font-semibold text-gray-800 mb-3">Ride Details</h5>
+         <div className="flex justify-between">
+            <span className="text-gray-600">Distance:</span>
+            <span className="font-medium">{distance} km</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Duration:</span>
+            <span className="font-medium">{duration} min</span>
+          </div>
       </div>
 
       {/* Price Breakdown */}
       <div className="bg-blue-50 rounded-lg p-4 mb-6">
         <div className="flex justify-between items-center">
           <span className="text-lg font-semibold text-gray-800">Total Fare</span>
-          <span className="text-2xl font-bold text-blue-600">₹100</span>
+          <span className="text-2xl font-bold text-blue-600">₹{distance * (captain?.rideFeePerKm || 100)}</span>
         </div>
         <p className="text-sm text-gray-600 mt-1">Including taxes and fees</p>
       </div>

@@ -39,9 +39,7 @@ const Location = ({ query, onLocationSelect }) => {
             <MapPin className="w-5 h-5 text-blue-600" />
           </div>
           <div className="flex-1">
-            {/* OSM response uses `name` instead of `description` */}
             <h4 className="font-medium text-gray-900">{location.name}</h4>
-            {/* optional: show coordinates for debugging */}
             <p className="text-xs text-gray-500">
               {location.lat}, {location.lon}
             </p>

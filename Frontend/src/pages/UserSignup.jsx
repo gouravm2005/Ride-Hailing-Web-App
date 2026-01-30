@@ -38,8 +38,6 @@ const UserSignup = () => {
 
       if (response.status === 201) {
         const { token, user } = response.data;
-        // localStorage.setItem("userAuth", JSON.stringify({ token:token, role: "user" }));
-        // localStorage.setItem("user", JSON.stringify(user));
         sessionStorage.removeItem("captainAuth");
         sessionStorage.removeItem("captain");
         sessionStorage.setItem("userAuth", JSON.stringify({ token:token, role: "user" }));

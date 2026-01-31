@@ -13,7 +13,10 @@ const cookiesParser = require('cookie-parser');
 const app = express()
 
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin:  [
+    "http://localhost:5173",
+    "https://ezride-f7vi.onrender.com"
+  ],
   methods: ["GET", "POST"],
   credentials: true,
  }             

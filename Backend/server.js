@@ -11,7 +11,10 @@ const { setupSocket } = require("./socket/socketManager.js");
 const server = http.createServer(app); 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://ezride-f7vi.onrender.com"
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -20,7 +23,11 @@ const io = require("socket.io")(server, {
 // Middlewares
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://ezride-f7vi.onrender.com"
+  ],
+  methods: ["GET", "POST"],
   credentials: true,
 }));
 
@@ -29,7 +36,7 @@ if (process.env.NODE_ENV === "production") {
     helmet.contentSecurityPolicy({
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", "https://Appdomain.com"],
+        connectSrc: ["'self'", "https://ezride-f7vi.onrender.com"],
       },
     })
   );

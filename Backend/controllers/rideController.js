@@ -4,7 +4,7 @@ const Captain = require('../models/captain.model.js')
 const Ride = require('../models/ride.model.js')
 const User = require('../models/user.model.js')
 const { createNotification } = require("./notificationController.js");
-const { sendToUser, sendToCaptain, sendToRideRoom} = require("../Socket/socketManager.js");
+const { sendToUser, sendToCaptain, sendToRideRoom} = require("../socket/socketManager.js");
 const Notification = require('../models/notification.model.js');
 const { startRideSimulation } = require("../services/rideTracking.service.js");
 

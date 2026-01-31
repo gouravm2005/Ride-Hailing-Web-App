@@ -6,7 +6,7 @@ const helmet = require("helmet");
 dotenv.config();
 
 const app = require("./app");
-const { setupSocket } = require("./Socket/socketManager");
+const { setupSocket } = require("./Socket/socketManager.js");
 
 const server = http.createServer(app); 
 const io = require("socket.io")(server, {

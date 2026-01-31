@@ -2,13 +2,13 @@ const express = require('express')
 const dotenv = require('dotenv')
 dotenv.config();
 const cors = require('cors')
-const connectToDB = require('./Database/db')
-const userRoutes = require('./Routes/user.route');
-const captainRoutes = require('./Routes/captain.route');
-const rideRoutes = require('./Routes/ride.route');
-const mapRoutes = require('./Routes/map.route');
-const paymentRoutes = require('./Routes/payment.route');
-const notificationRoutes = require('./Routes/notification.routes');
+const connectToDB = require('./Database/db.js')
+const userRoutes = require('./Routes/user.route.js');
+const captainRoutes = require('./Routes/captain.route.js');
+const rideRoutes = require('./Routes/ride.route.js');
+const mapRoutes = require('./Routes/map.route.js');
+const paymentRoutes = require('./Routes/payment.route.js');
+const notificationRoutes = require('./Routes/notification.routes.js');
 const cookiesParser = require('cookie-parser');
 const app = express()
 

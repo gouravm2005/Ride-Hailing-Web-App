@@ -1,6 +1,6 @@
 const express = require("express");
-const stripe = require("../config/stripe");
-const Ride = require("../models/ride.model");
+const stripe = require("../config/stripe.js");
+const Ride = require("../models/ride.model.js");
 
 exports.createPaymentIntent = async (req, res) => {
   try {

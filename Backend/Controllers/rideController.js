@@ -1,12 +1,12 @@
 const axios = require('axios');
 const fetch = require("node-fetch");
-const Captain = require('../Models/captain.model.js')
-const Ride = require('../Models/ride.model.js')
-const User = require('../Models/user.model.js')
+const Captain = require('../models/captain.model.js')
+const Ride = require('../models/ride.model.js')
+const User = require('../models/user.model.js')
 const { createNotification } = require("./notificationController.js");
 const { sendToUser, sendToCaptain, sendToRideRoom} = require("../Socket/socketManager.js");
-const Notification = require('../Models/notification.model.js');
-const { startRideSimulation } = require("../Services/rideTracking.service.js");
+const Notification = require('../models/notification.model.js');
+const { startRideSimulation } = require("../services/rideTracking.service.js");
 
 module.exports.getLocationSuggestions = async (req, res) => {
   try {

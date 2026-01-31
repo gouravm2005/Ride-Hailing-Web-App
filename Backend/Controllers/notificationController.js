@@ -1,4 +1,4 @@
-const Notification = require("../Models/notification.model.js");
+const Notification = require("../models/notification.model.js");
 
 // Create & Send Notification
 exports.createNotification = async (data, io) => {
@@ -8,7 +8,7 @@ exports.createNotification = async (data, io) => {
 
     // Emit real-time to receiver
     const { receiver, message } = notification;
-    const { sendNotification } = require("../Socket/socketManager");
+    const { sendNotification } = require("../Socket/socketManager.js");
     sendNotification(io, receiver.toString(), notification);
 
     return notification;

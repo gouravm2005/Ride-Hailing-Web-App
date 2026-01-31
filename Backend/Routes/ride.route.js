@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const {body} = require("express-validator")
 const rideController = require('../Controllers/rideController.js')
-const Authmiddleware = require('../middlewares/Auth.middleware.js')
+const Authmiddleware = require('../Middlewares/Auth.middleware.js')
 
 router.get("/getLocationSuggestions", rideController.getLocationSuggestions);
 router.post("/updateCaptainLocation", rideController.updateCaptainLocation);

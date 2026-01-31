@@ -1,5 +1,5 @@
-const Captain = require("../models/captain.model.js");
-const Ride = require("../models/ride.model.js");
+const Captain = require("../Models/captain.model.js");
+const Ride = require("../Models/ride.model.js");
 const { sendToRideRoom } = require("../Socket/socketManager.js");
 const axios = require("axios");
 

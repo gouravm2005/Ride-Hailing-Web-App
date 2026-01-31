@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const {body} = require("express-validator")
 const userController = require('../Controllers/user.controller.js')
-const Authmiddleware = require('../middlewares/Auth.middleware.js')
+const Authmiddleware = require('../Middlewares/Auth.middleware.js')
  
 router.post('/register', [
  body('email').isEmail().withMessage('Invalid Email'),

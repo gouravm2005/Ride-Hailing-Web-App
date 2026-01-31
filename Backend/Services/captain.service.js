@@ -1,4 +1,4 @@
-const captainModel = require('../models/captain.model.js')
+const captainModel = require('../Models/captain.model.js')
 
 module.exports.createCaptain = async({
  firstname, lastname, email, password, name, color, plate, capacity, vehicleType

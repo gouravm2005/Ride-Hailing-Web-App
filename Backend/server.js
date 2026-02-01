@@ -4,7 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 dotenv.config();
-
+const mongoose = require("mongoose");
 const app = require("./app");
 const { setupSocket } = require("./socket/socketManager.js");
 
@@ -53,8 +53,40 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+mongoose.set("bufferCommands", false);
 
-const port = process.env.PORT || 4000;
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+const PORT = process.env.PORT || 5000;
+
+/* 🔍 Mongoose connection events (DEBUGGING) */
+mongoose.connection.on("connecting", () => {
+  console.log("MongoDB connecting...");
 });
+
+mongoose.connection.on("connected", () => {
+  console.log("MongoDB connected");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
+
+mongoose.connection.on("disconnected", () => {
+  console.log("MongoDB disconnected");
+});
+
+/* 🚀 Start server ONLY after Mongo connects */
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "uberClone", // change if needed
+    });
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("MongoDB failed to connect:", err);
+    process.exit(1);
+  }
+})();
+

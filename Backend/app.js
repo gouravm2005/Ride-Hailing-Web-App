@@ -2,7 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 dotenv.config();
 const cors = require('cors')
-const connectToDB = require('./database/db.js')
+// const connectToDB = require('./database/db.js')
 const userRoutes = require('./routes/user.route.js');
 const captainRoutes = require('./routes/captain.route.js');
 const rideRoutes = require('./routes/ride.route.js');
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-connectToDB();
+// connectToDB();
 
 app.use('/api/user', userRoutes);
 

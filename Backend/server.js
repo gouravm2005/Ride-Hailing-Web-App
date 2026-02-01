@@ -36,7 +36,12 @@ if (process.env.NODE_ENV === "production") {
     helmet.contentSecurityPolicy({
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", "https://ezride-f7vi.onrender.com"],
+        connectSrc: ["'self'", 
+          "https://ezride-f7vi.onrender.com",
+          "https://ezride-backend.onrender.com",
+          "wss://ezride-backend.onrender.com",
+          "ws://localhost:5000"
+        ],
       },
     })
   );

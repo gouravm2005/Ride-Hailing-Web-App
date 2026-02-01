@@ -4,7 +4,7 @@ const {validationResult} = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model.js');
 
 module.exports.registerUser = async(req, res, next) => {
-
+try {
  const errors = validationResult(req);
  if(!errors.isEmpty()) {
   return res.status(400).json({errors:errors.array()});
@@ -30,9 +30,14 @@ module.exports.registerUser = async(req, res, next) => {
  const token = user.generateAuthToken();
 
  res.status(201).json({ token, user});
+} catch (error) {
+  console.error("REGISTER ERROR:", error);
+  res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 module.exports.loginUser = async(req, res, next) => {
+try {
  const errors = validationResult(req);
  if(!errors.isEmpty()) {
   return res.status(400).json({errors:errors.array()});
@@ -55,6 +60,10 @@ module.exports.loginUser = async(req, res, next) => {
  const token = user.generateAuthToken();
 
  res.status(201).json({ token, user});
+} catch (error) {
+  console.error("LOGIN ERROR:", error);
+  res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 module.exports.getUserProfile = async (req, res, next) => {

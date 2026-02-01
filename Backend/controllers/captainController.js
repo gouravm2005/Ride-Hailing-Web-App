@@ -5,7 +5,7 @@ const blacklistTokenModel = require('../models/blacklistToken.model.js')
 
 
 module.exports.registerCaptain = async (req, res, next) => {
-
+ try {
    const errors = validationResult(req);
    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -38,10 +38,15 @@ module.exports.registerCaptain = async (req, res, next) => {
    console.log("Received Data:", JSON.stringify(req.body, null, 2));
 
    res.status(201).json({ token, captain });
+  } catch (error) {
+    console.error("REGISTER CAPTAIN ERROR:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 
 module.exports.loginCaptain = async (req, res, next) => {
+  try {
    const errors = validationResult(req);
    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -74,6 +79,10 @@ module.exports.loginCaptain = async (req, res, next) => {
    res.cookie('token', token)
 
    res.status(201).json({ token, captain });
+  } catch (error) {
+    console.error("LOGIN CAPTAIN ERROR:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 module.exports.getAvailableCaptain = async (req, res, next) => {

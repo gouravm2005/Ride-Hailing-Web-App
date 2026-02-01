@@ -32,7 +32,10 @@ try {
  res.status(201).json({ token, user});
 } catch (error) {
   console.error("REGISTER ERROR:", error);
-  res.status(500).json({ message: "Internal server error" });
+   res.status(500).json({
+    message: "Internal server error",
+    error: error.message,
+  });
   }
 }
 
@@ -61,8 +64,11 @@ try {
 
  res.status(201).json({ token, user});
 } catch (error) {
-  console.error("LOGIN ERROR:", error);
-  res.status(500).json({ message: "Internal server error" });
+  console.error("LOGIN ERROR", error);
+  res.status(500).json({
+    message: "Internal server error",
+    error: error.message,
+  });
   }
 }
 

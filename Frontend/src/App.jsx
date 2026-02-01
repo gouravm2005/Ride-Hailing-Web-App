@@ -1,6 +1,7 @@
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import './App.css'
+import "./index.css";
 import CaptainSignup from './pages/CaptainSignup'
 import Captainlogin from './pages/Captainlogin'
 import UserSignup from './pages/UserSignup'

@@ -23,9 +23,6 @@ export default function CaptainHome() {
     async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/captain/getCaptainDetail/${captainId}`, {
-          headers: {
-            Authorization: `Bearer ${captainAuth.token}`,
-          },
         });
         console.log("Captain detail response:", res.data);
         const cap = res.data;
@@ -75,7 +72,6 @@ export default function CaptainHome() {
             onClick={() => {
               setIsOnline(prev => {
                 const newStatus = !prev;
-
                 updateCaptainStatus(newStatus);
 
                 return newStatus;

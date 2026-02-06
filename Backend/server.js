@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === "production") {
           "https://ezride-f7vi.onrender.com",
           "https://ezride-backend.onrender.com",
           "wss://ezride-backend.onrender.com",
-          "ws://localhost:5000"
+          "ws://localhost:4000"
         ],
       },
     })

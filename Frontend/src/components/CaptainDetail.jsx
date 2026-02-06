@@ -189,7 +189,7 @@ const getRideETA = async () => {
       <div className="bg-blue-50 rounded-lg p-4 mb-6">
         <div className="flex justify-between items-center">
           <span className="text-lg font-semibold text-gray-800">Total Fare</span>
-          <span className="text-2xl font-bold text-blue-600">₹{distance * (captain?.rideFeePerKm || 100)}</span>
+          <span className="text-2xl font-bold text-blue-600">₹{Math.round(distance * (captain?.rideFeePerKm || 100))}</span>
         </div>
         <p className="text-sm text-gray-600 mt-1">Including taxes and fees</p>
       </div>

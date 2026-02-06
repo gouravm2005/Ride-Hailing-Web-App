@@ -48,7 +48,7 @@ const CaptainSignup = () => {
         sessionStorage.setItem("captain", JSON.stringify(captain));
         setCaptain(captain); 
         window.dispatchEvent(new Event("auth-changed"));
-        navigate("/CaptainHome");
+        navigate("/CaptainHome", { state: { captainId: captain._id } });
       }
     } catch (err) {
       console.error('Signup error:', err.response?.data || err.message);

@@ -81,7 +81,7 @@ mongoose.connection.on("disconnected", () => {
       dbName: "uberClone", // change if needed
     });
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {
